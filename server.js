@@ -4,6 +4,8 @@ const path = require("path");
 var bodyParser = require('body-parser');
 var firebase = require('firebase');
 //var serviceAccount = require("./service-account-file.json");
+const admin = require('./firebase');
+
 
 var firebaseConfig = {
   apiKey: "AIzaSyB8qtYqUk95tgv1dtIp1e-VUayLgaomHYU",
@@ -27,14 +29,14 @@ app.use(express.static(__dirname+'/public'));
 app.get("/", function(req,res){
     res.render("index");
 })
-app.post("/intoLogin",function(req,res){
+app.get("/intoLogin",function(req,res){
     res.render("login");
 })
 app.post("/login",function(req,res){
     console.log("naber");
-    console.log(req.body.username);
+    console.log(req.body.email);
     console.log(req.body.pass);
-    firebase.auth().signInWithEmailAndPassword(req.body.username, req.body.pass)
+    firebase.auth().signInWithEmailAndPassword(req.body.email, req.body.pass)
     .then((userCredential) => {
       // Signed in
       var user = userCredential.user;
@@ -47,6 +49,45 @@ app.post("/login",function(req,res){
       var errorMessage = error.message;
       res.send("giremedim abi")
       console.log("Giremeeeeediiiiiiiiim");
+    });
+
+});
+app.get("/intoCreate",function(req,res){
+  res.render("create")
+});
+
+app.post("/create",function(req,res){
+  console.log(req.body.email);
+  console.log(req.body.password);
+  console.log(req.body.country);
+  console.log(req.body.gender);
+  firebase.auth().createUserWithEmailAndPassword(req.body.email, req.body.password)
+    .then((userCredential) => {
+      // Signed in 
+      var user = userCredential.user;
+      console.log(user.uid);
+      const userData = {
+        age: req.body.age,
+        country: req.body.country,
+        ebooks: new Map(),
+        language: req.body.language,
+        email: req.body.email,
+        gender: req.body.gender,
+        userId: user.uid
+    }
+      console.log("geldim");
+      admin.db.collection("Users").doc(user.uid).set(userData).then(() =>{
+        console.log("Ekledim abi sağol");
+      }).catch((err) => {
+        console.log(err);
+      });
+      
+      // ...
+    })
+    .catch((error) => {
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      // ..
     });
 
 })

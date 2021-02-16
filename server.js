@@ -2,10 +2,10 @@ var express = require('express');
 app = express();
 const path = require("path");
 var bodyParser = require('body-parser');
-var firebase = require('firebase');
+var firebase = require('firebase/app');
+require("firebase/auth");
+require("firebase/firestore");
 //var serviceAccount = require("./service-account-file.json");
-const admin = require('./firebase');
-
 
 var firebaseConfig = {
   apiKey: "AIzaSyB8qtYqUk95tgv1dtIp1e-VUayLgaomHYU",
@@ -18,6 +18,8 @@ var firebaseConfig = {
 };
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
 app.engine('.html',require('ejs').renderFile)
 app.set('views',__dirname + '/views');
@@ -26,8 +28,10 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 app.use(express.static(__dirname+'/public'));
 
+var credentials;
 app.get("/", function(req,res){
     res.render("index");
+    db.collection("Users").doc().set({farkmaz: "naber"});
 })
 app.get("/intoLogin",function(req,res){
     res.render("login");
@@ -56,15 +60,16 @@ app.get("/intoCreate",function(req,res){
   res.render("create")
 });
 
-app.post("/create",function(req,res){
+app.post("/create",function(req,res) {
   console.log(req.body.email);
   console.log(req.body.password);
   console.log(req.body.country);
   console.log(req.body.gender);
-  firebase.auth().createUserWithEmailAndPassword(req.body.email, req.body.password)
+  auth.createUserWithEmailAndPassword(req.body.email, req.body.password)
     .then((userCredential) => {
       // Signed in 
       var user = userCredential.user;
+      credentials = userCredential.user;
       console.log(user.uid);
       const userData = {
         age: req.body.age,
@@ -76,11 +81,13 @@ app.post("/create",function(req,res){
         userId: user.uid
     }
       console.log("geldim");
-      admin.db.collection("Users").doc(user.uid).set(userData).then(() =>{
-        console.log("Ekledim abi sağol");
-      }).catch((err) => {
-        console.log(err);
+      db.collection("Users").doc(user.uid).set(userData).then(()=>{
+        console.log("oldu")
+      }).catch(() =>{
+        console.log("olmadı")
       });
+      //firebase.firestore().collection("Users").doc(user.uid).set(userData);
+        
       
       // ...
     })

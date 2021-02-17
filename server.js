@@ -1,10 +1,11 @@
 var express = require('express');
 app = express();
+var bodyParser = require('body-parser')
 const path = require("path");
-var bodyParser = require('body-parser');
 var firebase = require('firebase/app');
 require("firebase/auth");
 require("firebase/firestore");
+const bcrypt = require("bcrypt");
 //var serviceAccount = require("./service-account-file.json");
 
 var firebaseConfig = {
@@ -24,14 +25,14 @@ const db = firebase.firestore();
 app.engine('.html',require('ejs').renderFile)
 app.set('views',__dirname + '/views');
 app.set('view engine', 'html');
-app.use(bodyParser.urlencoded({extended:true}));
-app.use(bodyParser.json());
+app.use(express.urlencoded({extended:true}));
+app.use(express.json());
 app.use(express.static(__dirname+'/public'));
 
 var credentials;
 app.get("/", function(req,res){
-    res.render("index");
-    db.collection("Users").doc().set({farkmaz: "naber"});
+    res.render("userMainPage");
+    //db.collection("Users").doc().set({farkmaz: "naber"});
 })
 app.get("/intoLogin",function(req,res){
     res.render("login");
@@ -60,7 +61,8 @@ app.get("/intoCreate",function(req,res){
   res.render("create")
 });
 
-app.post("/create",function(req,res) {
+
+app.post("/create", function(req,res){
   console.log(req.body.email);
   console.log(req.body.password);
   console.log(req.body.country);
@@ -71,21 +73,19 @@ app.post("/create",function(req,res) {
       var user = userCredential.user;
       credentials = userCredential.user;
       console.log(user.uid);
-      const userData = {
-        age: req.body.age,
-        country: req.body.country,
-        ebooks: new Map(),
-        language: req.body.language,
-        email: req.body.email,
-        gender: req.body.gender,
+      var userData = {
+        age: req.body.age.toString(),
+        country: req.body.country.toString(),
+        ebooks: {},
+        email: req.body.email.toString(),
+        gender: req.body.gender.toString(),
         userId: user.uid
     }
-      console.log("geldim");
-      db.collection("Users").doc(user.uid).set(userData).then(()=>{
-        console.log("oldu")
-      }).catch(() =>{
-        console.log("olmadı")
-      });
+    db.collection("Users").doc(userData.userId).set(userData).then(()=>{
+      console.log("oldu")
+    }).catch(() =>{
+      console.log("olmadı")
+    });
       //firebase.firestore().collection("Users").doc(user.uid).set(userData);
         
       
@@ -96,6 +96,8 @@ app.post("/create",function(req,res) {
       var errorMessage = error.message;
       // ..
     });
+
+  
 
 })
 

@@ -33,7 +33,11 @@ var credentials;
 app.get("/", function(req,res){
     res.render("userAvailableBooks");
     //db.collection("Users").doc().set({farkmaz: "naber"});
-})
+});
+app.get("/userPDFReader",function(req,res){
+    res.render("userPDFReader")
+});
+
 app.get("/intoLogin",function(req,res){
     res.render("login");
 })

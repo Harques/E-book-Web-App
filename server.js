@@ -31,7 +31,7 @@ app.use(express.static(__dirname+'/public'));
 
 var credentials;
 app.get("/", function(req,res){
-    res.render("userMainPage");
+    res.render("userAvailableBooks");
     //db.collection("Users").doc().set({farkmaz: "naber"});
 })
 app.get("/intoLogin",function(req,res){

@@ -16,11 +16,10 @@ var pdfDoc = null,
 function renderPage(num) {
   pageRendering = true;
 
-  pdfDoc.getPage(num).then(function(page) {    
-    canvas.height = 720;
-    canvas.width = 1280;
-    var viewport = page.getViewport(canvas.height/page.getViewport(1.0).height);
-
+  pdfDoc.getPage(num).then(function(page) {
+    var viewport = page.getViewport({scale: scale});
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
 
     var renderContext = {
       canvasContext: ctx,

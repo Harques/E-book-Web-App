@@ -335,3 +335,8 @@ html { height: 100%;}
 .listlast{
   margin-top: auto;
 }
+
+.carousel-indicators{
+  background-color: gray;
+  bottom:-50px;
+}

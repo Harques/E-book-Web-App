@@ -1,4 +1,4 @@
-var url = 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf';
+var url = '/stylesheets/userPDFReader/js/deneme.pdf';
 
 var pdfjsLib = window['pdfjs-dist/build/pdf'];
 

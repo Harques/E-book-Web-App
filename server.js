@@ -50,7 +50,7 @@ app.post("/login",function(req,res){
       // Signed in
       var user = userCredential.user;
       console.log("Girdim ya sakin");
-      res.send("Girdim abi sağol")
+      res.render("userPDFReader");
       // ...
     })
     .catch((error) => {

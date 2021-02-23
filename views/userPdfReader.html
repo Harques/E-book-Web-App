@@ -26,19 +26,14 @@
                     <a href="#">Home</a>
                 </li>
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Works <span class="caret"></span></a>
-                    <ul class="dropdown-menu" role="menu">
-                      <li class="dropdown-header">Dropdown heading</li>
-                      <li><a href="#">Action</a></li>
-                      <li><a href="#">Another action</a></li>
-                      <li><a href="#">Something else here</a></li>
-                      <li><a href="#">Separated link</a></li>
-                      <li><a href="#">One more separated link</a></li>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Library <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu" id="library">
+                      <li class="dropdown-header">Books</li>
                     </ul>
                   </li>
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">Works <span class="caret"></span></a>
-                  <ul class="dropdown-menu" role="menu">
+                  <ul class="dropdown-menu" role="menu" id="credentials">
                     <li class="dropdown-header">Dropdown heading</li>
                     <li><a href="#">Action</a></li>
                     <li><a href="#">Another action</a></li>
@@ -111,6 +106,15 @@
               $('#wrapper').toggleClass('toggled');
         });  
       });
+      </script>
+      <script>
+        $.get("/library",function(data,status){
+          for(i = 0; i<data.length;i++){
+            $(document).ready(function(){
+              $("#library").append("<li><a href=\"#\">"+data[i]+"</a></li>")
+            })
+          }
+        })
       </script>
       <script src="/stylesheets/userPDFReader/js/main.js"></script>
 </body>

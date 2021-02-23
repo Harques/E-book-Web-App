@@ -6,8 +6,18 @@ var firebase = require('firebase/app');
 require("firebase/auth");
 require("firebase/firestore");
 const bcrypt = require("bcrypt");
-//var serviceAccount = require("./service-account-file.json");
 
+var jsdom = require("jsdom");
+const { JSDOM } = jsdom;
+const { window } = new JSDOM();
+const { document } = (new JSDOM('')).window;
+global.document = document;
+
+var $ = jQuery = require('jquery')(window);
+//var serviceAccount = require("./service-account-file.json");
+let ownedBooks = []
+
+var userID;
 var firebaseConfig = {
   apiKey: "AIzaSyB8qtYqUk95tgv1dtIp1e-VUayLgaomHYU",
   authDomain: "e-book-app-e4ef1.firebaseapp.com",
@@ -31,7 +41,7 @@ app.use(express.static(__dirname+'/public'));
 
 var credentials;
 app.get("/", function(req,res){
-    res.render("userAvailableBooks");
+    res.render("index");
     //db.collection("Users").doc().set({farkmaz: "naber"});
 });
 app.get("/userPDFReader",function(req,res){
@@ -50,7 +60,10 @@ app.post("/login",function(req,res){
       // Signed in
       var user = userCredential.user;
       console.log("Girdim ya sakin");
+      userID = user.uid;
+      console.log(userID);
       res.render("userPDFReader");
+      
       // ...
     })
     .catch((error) => {
@@ -64,7 +77,24 @@ app.post("/login",function(req,res){
 app.get("/intoCreate",function(req,res){
   res.render("create")
 });
+app.get("/library",function(req,res){
+  ownedBooks = [];
+  let userFirestore = db.collection("Users").doc(userID);
+      userFirestore.get().then((books) =>{
+      var data = books.get("ebooks");
+        for(var key in data){
+          if (data.hasOwnProperty(key) ){
+            ownedBooks.push(key);
+          }
+        }
+        console.log(ownedBooks);
+        console.log(userID);
+        res.send(ownedBooks);
+      });
 
+
+  console.log("oh yeah")
+});
 
 app.post("/create", function(req,res){
   console.log(req.body.email);

@@ -6,14 +6,8 @@ var firebase = require('firebase/app');
 require("firebase/auth");
 require("firebase/firestore");
 const bcrypt = require("bcrypt");
+var admin = require("./admin");
 
-var jsdom = require("jsdom");
-const { JSDOM } = jsdom;
-const { window } = new JSDOM();
-const { document } = (new JSDOM('')).window;
-global.document = document;
-
-var $ = jQuery = require('jquery')(window);
 //var serviceAccount = require("./service-account-file.json");
 let ownedBooks = []
 
@@ -32,6 +26,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+
 app.engine('.html',require('ejs').renderFile)
 app.set('views',__dirname + '/views');
 app.set('view engine', 'html');
@@ -46,6 +41,9 @@ app.get("/", function(req,res){
 });
 app.get("/userPDFReader",function(req,res){
     res.render("userPDFReader")
+});
+app.get("/admin",function(req,res){
+    res.render("admin")
 });
 
 app.get("/userAvailableBooks",function(req,res){
@@ -100,7 +98,51 @@ app.get("/credentials",function(req,res){
     console.log(credentials.data())
     res.send(credentials.data());
   });
-})
+});
+
+app.get("/userListing",function(req,res){
+  const documents = [];
+  let userFirestore = db.collection("Users")
+  var counter = 0;
+  userFirestore.get().then((querySnapshot)=>{
+    querySnapshot.forEach((userDoc) => {
+      console.log(userDoc.data())
+      documents[counter++] = userDoc.data()
+    })
+    res.send(documents)
+  })
+    
+});
+
+app.post("/adminlogin",function(req,res){
+  try{
+    let userFirestore = db.collection("Admins").doc(req.body.username);
+    userFirestore.get().then((password) =>{
+    var data = password.get("password");
+      if(data = req.body.pass){
+        res.render("adminBackend");
+      }
+    });
+  }
+  catch{
+    res.send(err);
+  }
+
+});
+app.post("/adminUserList",function(req,res){
+  res.render("adminUserList")
+
+});
+app.post("/adminBackend",function(req,res){
+  res.render("adminBackend")
+});
+app.post("/adminEbooksList",function(req,res){
+  res.render("adminEbooksList")
+});
+app.post("/adminAdminList",function(req,res){
+  res.render("adminAdminList")
+});
+
 app.post("/create", function(req,res){
   console.log(req.body.email);
   console.log(req.body.password);

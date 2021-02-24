@@ -22,31 +22,24 @@
                    Brand
                 </a>
             </li>
-            <li>
-                <a href="./userPDFReader">Home</a>
-            </li>
+
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Works <span class="caret"></span></a>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Library <span class="caret"></span></a>
               <ul class="dropdown-menu" role="menu" id="library">
-                <li class="dropdown-header">Dropdown heading</li>
-                <li><a href="#">Action</a></li>
-                <li><a href="#">Another action</a></li>
-                <li><a href="#">Something else here</a></li>
-                <li><a href="#">Separated link</a></li>
-                <li><a href="#">One more separated link</a></li>
+                <li class="dropdown-header">Books</li>
+                
               </ul>
             </li>
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Works <span class="caret"></span></a>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Account <span class="caret"></span></a>
               <ul class="dropdown-menu" role="menu" id="credentials">
-                <li class="dropdown-header">Dropdown heading</li>
-                <li><a href="#">Action</a></li>
-                <li><a href="#">Another action</a></li>
-                <li><a href="#">Something else here</a></li>
-                <li><a href="#">Separated link</a></li>
-                <li><a href="#">One more separated link</a></li>
+                <li class="dropdown-header">Credentials</li>
+                
               </ul>
             </li>
+            <li>
+              <a href="./userPDFReader">Home</a>
+          </li>
             <li>
               <a href="https://twitter.com/maridlcrmn">Follow me</a>
           </li>
@@ -206,6 +199,19 @@ $(document).ready(function(){
     });
 });
 </script>
-
+<script>
+  $.get("/library",function(data,status){
+    for(i = 0; i<data.length;i++){
+      $(document).ready(function(){
+        $("#library").append("<li><a href=\"#\">"+data[i]+"</a></li>")
+      })
+    }
+  });
+</script>
+<script>
+  $.get("/credentials",function(data,status){
+      console.log(data);
+  });
+</script>
 </body>
 </html>

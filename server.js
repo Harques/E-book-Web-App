@@ -48,6 +48,10 @@ app.get("/userPDFReader",function(req,res){
     res.render("userPDFReader")
 });
 
+app.get("/userAvailableBooks",function(req,res){
+  res.render("userAvailableBooks")
+});
+
 app.get("/intoLogin",function(req,res){
     res.render("login");
 })
@@ -87,15 +91,16 @@ app.get("/library",function(req,res){
             ownedBooks.push(key);
           }
         }
-        console.log(ownedBooks);
-        console.log(userID);
         res.send(ownedBooks);
       });
-
-
-  console.log("oh yeah")
 });
-
+app.get("/credentials",function(req,res){
+  let userFirestore = db.collection("Users").doc(userID);
+  userFirestore.get().then((credentials) =>{
+    console.log(credentials.data())
+    res.send(credentials.data());
+  });
+})
 app.post("/create", function(req,res){
   console.log(req.body.email);
   console.log(req.body.password);

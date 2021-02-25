@@ -312,3 +312,32 @@ html { height: 100%;}
 .listlast{
   margin-top: auto;
 }
+
+span.a{
+  display: inline; /* the default for span */
+  width: 100px;
+  height: 100px;
+  padding: 5px;
+  border: 1px solid red;  
+  background-color: white; 
+  font-size: 20px;
+}
+th{
+  padding: 15px;
+}
+td{
+  padding-left: 20px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+button.b{
+  display: inline;
+  padding: 2px;
+  border: 1px solid red;
+  background-color: white;
+  font-size:20px;
+}
+
+.highlight { 
+  background-color: #b8b8b8; 
+} 

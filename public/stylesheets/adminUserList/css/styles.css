@@ -313,7 +313,7 @@ html { height: 100%;}
   margin-top: auto;
 }
 
-span.a {
+span.a{
   display: inline; /* the default for span */
   width: 100px;
   height: 100px;
@@ -329,8 +329,4 @@ td{
   padding-left: 20px;
   padding-top: 2px;
   padding-bottom: 2px;
-}
-table, th, td {
-  border: 1px solid black;
-  border-collapse: collapse;
 }

@@ -99,7 +99,20 @@ app.get("/credentials",function(req,res){
     res.send(credentials.data());
   });
 });
-
+app.get("/adminListing",function(req,res){
+  const documents = [];
+  let userFirestore = db.collection("Admins")
+  var counter = 0;
+  userFirestore.get().then((querySnapshot)=>{
+    querySnapshot.forEach((userDoc) => {
+      documents.push([])
+      documents[counter][0] = userDoc.id
+      console.log(userDoc.data())
+      documents[counter++][1] = userDoc.data()
+    })
+    res.send(documents)
+  })
+})
 app.get("/userListing",function(req,res){
   const documents = [];
   let userFirestore = db.collection("Users")
@@ -129,6 +142,18 @@ app.post("/adminlogin",function(req,res){
   }
 
 });
+
+app.post("/adminDelete",function(req,res){
+  processes = []
+  for(i = 0; i<req.body.length;i++){
+    let userFirestore = db.collection("Admins").doc(req.body[i])
+    processes.push(userFirestore.delete())
+  }
+  Promise.all(processes).then(res.send.bind(res))
+    
+    console.log(req.body[0])
+});
+
 app.post("/adminUserList",function(req,res){
   res.render("adminUserList")
 
@@ -142,6 +167,7 @@ app.post("/adminEbooksList",function(req,res){
 app.post("/adminAdminList",function(req,res){
   res.render("adminAdminList")
 });
+
 
 app.post("/create", function(req,res){
   console.log(req.body.email);

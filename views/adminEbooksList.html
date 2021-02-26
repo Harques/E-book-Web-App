@@ -40,14 +40,34 @@
             </button>
             <div class="container">
                     <div class="col-lg-8">
-                        <div>
-                            <button id="prev">Previous page</button>
-                          
-                            <button id="next">Next page</button>
-                          
-                            <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
-                          </div>
-                        <canvas id ="pdf-render"></canvas>
+                        <h1>eBook Title List</h1>
+                        <table id="admins">
+                            <tr>
+                            <th>
+                                <span class="a">eBook Title</span>
+                            </th>       
+                            <th>
+                                <span class="a">Language</span>
+                            </th>
+                            
+                            <th>
+                              <span class="a">File</span>
+                            </th>
+                            <th>
+                              <form action="/adminEdit" method="post">
+                                  <button class="b" type="submit">Edit</button>
+                                  </form>
+                            </th>
+                            <th>
+                                <button class="b" id="delete">Delete</button>
+                            </th>
+                            <th>
+                              <form action="/adminNew" method="post">
+                                <button class="b" type="submit">New</button>
+                                </form>
+                            </th>
+                            </tr>
+                        </table>
                     </div>
             </div>
         </div>
@@ -89,5 +109,56 @@
         });  
       });
       </script>
+      <script>
+        $.get("/booksListing",function(data,status){
+            $(document).ready(function(){
+                for(i = 0; i <data.length;i++){
+                    $("#admins").append("<tr id=\"" +i+"\"></tr>")
+                    $("#"+i).append("<td>"+data[i][0]+"</td>")
+                    $("#"+i).append("<td>"+data[i][1].password+"</td>")
+                }
+            })
+                for(i=0; i<data.length;i++){
+                    document.getElementById(i).addEventListener('click',highlight);
+                }
+          console.log(data);
+        });
+        function highlight(item){
+            // To get tr tag  
+            // In the row where we click 
+            var row = item.path[1]; 
+            // Toggle the highlight 
+            if (row.classList.contains('highlight')) 
+              row.classList.remove('highlight'); 
+            else 
+              row.classList.add('highlight'); 
+        }
+      </script>
+      <script>
+        $("#delete").click(function(){
+          var temp = document.getElementsByClassName('highlight')
+          var elements = document.getElementsByTagName('tr');
+          if(elements.length-1===temp.length){
+            alert("You can not delete all accounts")
+          }
+          else{
+            var deleteAccounts = []
+          for(i = 0; i<temp.length;i++){
+            deleteAccounts.push(temp[i].firstChild.innerHTML)
+            console.log(temp[i].firstChild.innerHTML)
+          }
+          $.post({
+        traditional: true,
+        url: '/adminDelete',
+        contentType: 'application/json',
+        data: JSON.stringify(deleteAccounts),
+        dataType: 'json',
+        success: function(response){if(response)location.reload()}
+} );
+          }
+          
+      });
+      </script>
+      <script src="/stylesheets/adminEbooksList/js/admin.js"></script>
 </body>
 </html>

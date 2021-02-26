@@ -7,6 +7,8 @@ require("firebase/auth");
 require("firebase/firestore");
 const bcrypt = require("bcrypt");
 var admin = require("./admin");
+let alert = require('alert');
+
 
 //var serviceAccount = require("./service-account-file.json");
 let ownedBooks = []
@@ -113,6 +115,20 @@ app.get("/adminListing",function(req,res){
     res.send(documents)
   })
 })
+app.get("/booksListing",function(req,res){
+  const documents = [];
+  let userFirestore = db.collection("Books")
+  var counter = 0;
+  userFirestore.get().then((querySnapshot)=>{
+    querySnapshot.forEach((userDoc) => {
+      documents.push([])
+      documents[counter][0] = userDoc.id
+      console.log(userDoc.data())
+      documents[counter++][1] = userDoc.data()
+    })
+    res.send(documents)
+  })
+})
 app.get("/userListing",function(req,res){
   const documents = [];
   let userFirestore = db.collection("Users")
@@ -150,8 +166,10 @@ app.post("/adminDelete",function(req,res){
     processes.push(userFirestore.delete())
   }
   Promise.all(processes).then(res.send.bind(res))
-    
-    console.log(req.body[0])
+  for(i = 0; i< req.body.length;i++){
+    console.log(req.body[i])
+  } 
+   
 });
 
 app.post("/adminUserList",function(req,res){
@@ -166,6 +184,55 @@ app.post("/adminEbooksList",function(req,res){
 });
 app.post("/adminAdminList",function(req,res){
   res.render("adminAdminList")
+});
+app.post("/adminNew",function(req,res){
+  res.render("adminNew")
+});
+app.post("/adminEdit",function(req,res){
+  res.render("adminEdit")
+});
+app.post("/adminNewAccount",function(req,res){
+  console.log(req.body.user)
+  let userFirestore = db.collection("Admins").doc(req.body.user);
+  const getDoc = userFirestore.get().then((doc)=>{
+    console.log(doc.exists)
+    if(doc.exists){
+      console.log("girdi")
+      res.status(409).send("User exists") 
+    }
+    else{
+    var adminData ={
+      password: req.body.password
+    };
+    userFirestore.set(adminData).then(res.send("OK"));
+    //console.log("WHYYYYYYYYY")
+    //res.render("adminAdminList");
+  }
+  })
+
+  
+});
+
+app.post("/adminEditAccount",function(req,res){
+  console.log(req.body.user)
+  let userFirestore = db.collection("Admins").doc(req.body.user);
+  const getDoc = userFirestore.get().then((doc)=>{
+    console.log(doc.exists)
+    if(!doc.exists){
+      console.log("girdi")
+      res.status(409).send("User does not exist") 
+    }
+    else{
+    var adminData ={
+      password: req.body.password
+    };
+    userFirestore.update(adminData).then(res.send("OK"));
+    //console.log("WHYYYYYYYYY")
+    //res.render("adminAdminList");
+  }
+  })
+
+  
 });
 
 

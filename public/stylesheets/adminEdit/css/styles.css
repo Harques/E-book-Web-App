@@ -313,31 +313,18 @@ html { height: 100%;}
   margin-top: auto;
 }
 
-span.a{
-  display: inline; /* the default for span */
-  width: 100px;
-  height: 100px;
-  padding: 5px;
-  border: 1px solid red;  
-  background-color: white; 
-  font-size: 20px;
-}
-th{
-  padding: 15px;
-}
-td{
-  padding-left: 20px;
-  padding-top: 2px;
-  padding-bottom: 2px;
+.editAccount{
+  width:100%;
+  font-size: 30px;
+  margin:5px;
 }
 button.b{
   display: inline;
   padding: 2px;
   border: 1px solid red;
   background-color: white;
-  font-size:20px;
+  font-size:30px;
+  text-align: center;
+  margin-left: 45%;
+  margin-top:30px;
 }
-
-.highlight { 
-  background-color: #b8b8b8; 
-} 

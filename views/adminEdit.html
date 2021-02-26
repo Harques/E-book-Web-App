@@ -7,7 +7,7 @@
     <title>Admin</title>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="/stylesheets/adminAdminList/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/adminEdit/css/styles.css">
 </head>
 <body>
     <div id="wrapper">
@@ -40,31 +40,14 @@
             </button>
             <div class="container">
                     <div class="col-lg-8">
-                        <h1>Admin List</h1>
-                        <table id="admins">
-                            <tr>
-                            <th>
-                                <span class="a">User</span>
-                            </th>       
-                            <th>
-                                <span class="a">Password</span>
-                            </th>
-                            <th>
-                              <form action="/adminEdit" method="post">
-                                  <button class="b" type="submit">Edit</button>
-                                  </form>
-                            </th>
-                            <th>
-                                <button class="b" id="delete">Delete</button>
-                            </th>
-                            <th>
-                              <form action="/adminNew" method="post">
-                                <button class="b" type="submit">New</button>
-                                </form>
-                            </th>
-                            </tr>
-                        </table>
-                    </div>
+                        <h1>Edit Admin Account</h1>
+                        <form action="/adminEditAccount" method="post" id="editAccount">
+                          <input class="editAccount" type="text" name="user" id="user" placeholder="User:">
+                          <input class="editAccount" type="text" name="password" id="password" placeholder="Password:">
+                          <button class="b" type="submit">Save</button>
+                        </form>
+                          
+                        </div>
             </div>
         </div>
         <!-- /#page-content-wrapper -->
@@ -105,56 +88,39 @@
         });  
       });
       </script>
+
       <script>
-        $.get("/adminListing",function(data,status){
-            $(document).ready(function(){
-                for(i = 0; i <data.length;i++){
-                    $("#admins").append("<tr id=\"" +i+"\"></tr>")
-                    $("#"+i).append("<td>"+data[i][0]+"</td>")
-                    $("#"+i).append("<td>"+data[i][1].password+"</td>")
+      $(function() {
+    //hang on event of form with id=myform
+    $("#editAccount").submit(function(e) {
+
+        //prevent Default functionality
+        e.preventDefault();
+
+        //get the action-url of the form
+        var actionurl = e.currentTarget.action;
+
+        //do your own request an handle the results
+        $.ajax({
+                url: actionurl,
+                type: 'post',
+                dataType: 'application/json',
+                data: $("#editAccount").serialize(),
+                statusCode: {
+                  200: function(){alert("Admin account's password has been changed.");
+                    location.reload();},
+                  409: function(){alert("Admin account does not exist.");
+                location.reload();
+              }
                 }
-            })
-                for(i=0; i<data.length;i++){
-                    document.getElementById(i).addEventListener('click',highlight);
-                }
-          console.log(data);
+
+                
         });
-        function highlight(item){
-            // To get tr tag  
-            // In the row where we click 
-            var row = item.path[1]; 
-            // Toggle the highlight 
-            if (row.classList.contains('highlight')) 
-              row.classList.remove('highlight'); 
-            else 
-              row.classList.add('highlight'); 
-        }
+
+    });
+
+});
       </script>
-      <script>
-        $("#delete").click(function(){
-          var temp = document.getElementsByClassName('highlight')
-          var elements = document.getElementsByTagName('tr');
-          if(elements.length-1===temp.length){
-            alert("You can not delete all accounts")
-          }
-          else{
-            var deleteAccounts = []
-          for(i = 0; i<temp.length;i++){
-            deleteAccounts.push(temp[i].firstChild.innerHTML)
-            console.log(temp[i].firstChild.innerHTML)
-          }
-          $.post({
-        traditional: true,
-        url: '/adminDelete',
-        contentType: 'application/json',
-        data: JSON.stringify(deleteAccounts),
-        dataType: 'json',
-        success: function(response){if(response)location.reload()}
-} );
-          }
-          
-      });
-      </script>
-      <script src="/stylesheets/adminAdminList/js/admin.js"></script>
+      <script src="/stylesheets/adminEdit/js/admin.js"></script>
 </body>
 </html>

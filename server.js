@@ -27,7 +27,7 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
-
+const bucket = admin.bucket;
 
 app.engine('.html',require('ejs').renderFile)
 app.set('views',__dirname + '/views');
@@ -121,10 +121,8 @@ app.get("/booksListing",function(req,res){
   var counter = 0;
   userFirestore.get().then((querySnapshot)=>{
     querySnapshot.forEach((userDoc) => {
-      documents.push([])
-      documents[counter][0] = userDoc.id
+      documents[counter++] = userDoc.data()
       console.log(userDoc.data())
-      documents[counter++][1] = userDoc.data()
     })
     res.send(documents)
   })
@@ -143,12 +141,16 @@ app.get("/userListing",function(req,res){
     
 });
 
+app.post("/bookNew",function(req,res){
+  res.render("bookNew")
+});
+
 app.post("/adminlogin",function(req,res){
   try{
     let userFirestore = db.collection("Admins").doc(req.body.username);
     userFirestore.get().then((password) =>{
     var data = password.get("password");
-      if(data = req.body.pass){
+      if(data == req.body.pass){
         res.render("adminBackend");
       }
     });
@@ -205,8 +207,6 @@ app.post("/adminNewAccount",function(req,res){
       password: req.body.password
     };
     userFirestore.set(adminData).then(res.send("OK"));
-    //console.log("WHYYYYYYYYY")
-    //res.render("adminAdminList");
   }
   })
 
@@ -227,8 +227,6 @@ app.post("/adminEditAccount",function(req,res){
       password: req.body.password
     };
     userFirestore.update(adminData).then(res.send("OK"));
-    //console.log("WHYYYYYYYYY")
-    //res.render("adminAdminList");
   }
   })
 
@@ -273,6 +271,59 @@ app.post("/create", function(req,res){
 
   
 
+})
+
+app.post('/bookNewFile',(req, res) => {
+  console.log(req.body);
+  console.log(req.body.file);
+  console.log(req.body.language);
+  if(!req.body.file) {
+      res.status(400).send("Error: No files found")
+  
+  }
+  else if(req.body.file.split('.').pop() != "pdf"){
+      res.status(400).send("Error: File is not acceptable.");
+  }
+  /*else if(firebase.bucket.file(req.body.file).exists()){
+      res.status(400).send("Error: File already exists in the server.");
+  }*/
+  else {
+          var book = req.body.file.split(".");
+          book.pop();
+          const blob = bucket.file(req.body.file)
+          
+          const blobWriter = blob.createWriteStream({
+              metadata: {
+                  contentType: req.body.file.mimetype
+              }
+          })
+          
+          blobWriter.on('error', (err) => {
+              console.log(err)
+          })
+          
+          blobWriter.on('finish', () => {
+              res.status(200).send("File uploaded.")
+          })
+          
+          blobWriter.end(req.body.file.buffer)
+
+          var documentID = ""
+          var letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","0","1","2","3","4","5","6","7","8","9"]
+          for (i = 0; i<20; i++){
+            var index = Math.floor(Math.random()*36)
+            documentID += letters[index];
+          }
+          const bookData = {
+            id: documentID,
+            language: req.body.language,
+            title: book.join()
+        }
+          db.collection("Books").doc(documentID).set(bookData);
+          
+
+      
+  }
 })
 
 app.listen(4000,function(){

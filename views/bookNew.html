@@ -7,7 +7,7 @@
     <title>Admin</title>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="/stylesheets/adminEbooksList/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/bookNew/css/styles.css">
 </head>
 <body>
     <div id="wrapper">
@@ -40,29 +40,14 @@
             </button>
             <div class="container">
                     <div class="col-lg-8">
-                        <h1>eBook Title List</h1>
-                        <table id="books">
-                            <tr>
-                            <th>
-                                <span class="a">eBook Title</span>
-                            </th>       
-                            <th>
-                                <span class="a">Language</span>
-                            </th>
-                            <th>
-                              <span class="a">eBook ID</span>
-                          </th>
-                            <th>
-                                <button class="b" id="delete">Delete</button>
-                            </th>
-                            <th>
-                              <form action="/bookNew" method="post">
-                                <button class="b" type="submit">New</button>
-                                </form>
-                            </th>
-                            </tr>
-                        </table>
-                    </div>
+                        <h1>New eBook File</h1>
+                        <form action="/bookNewFile" method="post" id="newFile">
+                          <input class="newFile" type="file" name="file" id="file">
+                          <input class="newFile" type="text" name="language" id="language" placeholder="Language:">
+                          <button class="b" type="submit">Submit</button>
+                        </form>
+                          
+                        </div>
             </div>
         </div>
         <!-- /#page-content-wrapper -->
@@ -103,58 +88,43 @@
         });  
       });
       </script>
+
       <script>
-        $.get("/booksListing",function(data,status){
-          console.log(data);
-            $(document).ready(function(){
-                for(i = 0; i <data.length;i++){
-                    $("#books").append("<tr id=\"" +i+"\"></tr>")
-                    $("#"+i).append("<td>"+data[i].title+"</td>")
-                    $("#"+i).append("<td>"+data[i].language+"</td>")
-                    $("#"+i).append("<td>"+data[i].id+"</td>")
+      $(function() {
+    //hang on event of form with id=myform
+    $("#newFile").submit(function(e) {
+        var form = this;
+        var formData = new FormData(form);
+        
+
+        //prevent Default functionality
+        e.preventDefault();
+
+        //get the action-url of the form
+        var actionurl = e.currentTarget.action;
+
+        //do your own request an handle the results
+        $.ajax({
+                url: actionurl,
+                type: 'post',
+                data: formData,
+                contentType: false,
+                processData: false,
+                statusCode: {
+                  200: function(){alert("Admin account has been created.");
+                    location.reload();},
+                  400: function(){alert("Admin accounts already exists.");
+                location.reload();
+              }
                 }
-            })
-                for(i=0; i<data.length;i++){
-                    document.getElementById(i).addEventListener('click',highlight);
-                }
-          console.log(data);
+
+                
         });
-        function highlight(item){
-            // To get tr tag  
-            // In the row where we click 
-            var row = item.path[1]; 
-            // Toggle the highlight 
-            if (row.classList.contains('highlight')) 
-              row.classList.remove('highlight'); 
-            else 
-              row.classList.add('highlight'); 
-        }
+
+    });
+
+});
       </script>
-      <script>
-        $("#delete").click(function(){
-          var temp = document.getElementsByClassName('highlight')
-          var elements = document.getElementsByTagName('tr');
-          if(elements.length-1===temp.length){
-            alert("You can not delete all books")
-          }
-          else{
-            var deleteAccounts = []
-          for(i = 0; i<temp.length;i++){
-            deleteAccounts.push(temp[i].firstChild.innerHTML)
-            console.log(temp[i].firstChild.innerHTML)
-          }
-          $.post({
-        traditional: true,
-        url: '/adminDelete',
-        contentType: 'application/json',
-        data: JSON.stringify(deleteAccounts),
-        dataType: 'json',
-        success: function(response){if(response)location.reload()}
-} );
-          }
-          
-      });
-      </script>
-      <script src="/stylesheets/adminEbooksList/js/admin.js"></script>
+      <script src="/stylesheets/bookNew/js/admin.js"></script>
 </body>
 </html>

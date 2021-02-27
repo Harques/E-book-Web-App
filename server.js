@@ -5,9 +5,12 @@ const path = require("path");
 var firebase = require('firebase/app');
 require("firebase/auth");
 require("firebase/firestore");
+require("firebase/storage")
 const bcrypt = require("bcrypt");
 var admin = require("./admin");
-let alert = require('alert');
+const formidable = require('formidable');
+
+
 
 
 //var serviceAccount = require("./service-account-file.json");
@@ -27,7 +30,7 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
-const bucket = admin.bucket;
+const storage = firebase.storage();
 
 app.engine('.html',require('ejs').renderFile)
 app.set('views',__dirname + '/views');
@@ -272,11 +275,9 @@ app.post("/create", function(req,res){
   
 
 })
-
+/*
 app.post('/bookNewFile',(req, res) => {
-  console.log(req.body);
-  console.log(req.body.file);
-  console.log(req.body.language);
+  console.log(req.body.file.path);
   if(!req.body.file) {
       res.status(400).send("Error: No files found")
   
@@ -287,10 +288,10 @@ app.post('/bookNewFile',(req, res) => {
   /*else if(firebase.bucket.file(req.body.file).exists()){
       res.status(400).send("Error: File already exists in the server.");
   }*/
-  else {
+  /*else {
           var book = req.body.file.split(".");
           book.pop();
-          const blob = bucket.file(req.body.file)
+          /*const blob = bucket.file(req.body.file)
           
           const blobWriter = blob.createWriteStream({
               metadata: {
@@ -306,8 +307,20 @@ app.post('/bookNewFile',(req, res) => {
               res.status(200).send("File uploaded.")
           })
           
-          blobWriter.end(req.body.file.buffer)
-
+          blobWriter.end(req.body.file.buffer)*/
+          /*var storageRef = storage.ref(req.body.file)
+          var task = storageRef.put(req.body.file)
+          task.on('state_changed', function progress(snapshot) {
+            //var percentage = (snapshot.bytesTransferred/snapshot.totalBytes)*100;
+            //uploader.value = percentage;
+        
+          }, function error(err) {
+        
+        
+          },function complete() {
+        
+          });
+          //bucket.upload(req.body.file)
           var documentID = ""
           var letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","0","1","2","3","4","5","6","7","8","9"]
           for (i = 0; i<20; i++){
@@ -320,11 +333,9 @@ app.post('/bookNewFile',(req, res) => {
             title: book.join()
         }
           db.collection("Books").doc(documentID).set(bookData);
-          
-
       
   }
-})
+})*/
 
 app.listen(4000,function(){
     console.log("Server is running");

@@ -41,8 +41,8 @@
             <div class="container">
                     <div class="col-lg-8">
                         <h1>New eBook File</h1>
-                        <form action="/bookNewFile" method="post" id="newFile">
-                          <input class="newFile" type="file" name="file" id="file">
+                        <form action="" method="post" id="newFile">
+                          <input class="newFile" type="file" value="upload" name="file" id="file">
                           <input class="newFile" type="text" name="language" id="language" placeholder="Language:">
                           <button class="b" type="submit">Submit</button>
                         </form>
@@ -88,43 +88,39 @@
         });  
       });
       </script>
-
+      <script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-app.js"></script>
+      
+      <script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-storage.js"></script>
+      
       <script>
-      $(function() {
-    //hang on event of form with id=myform
-    $("#newFile").submit(function(e) {
-        var form = this;
-        var formData = new FormData(form);
-        
+        // Initialize Firebase
+        var firebaseConfig = {
+  apiKey: "AIzaSyB8qtYqUk95tgv1dtIp1e-VUayLgaomHYU",
+  authDomain: "e-book-app-e4ef1.firebaseapp.com",
+  projectId: "e-book-app-e4ef1",
+  storageBucket: "e-book-app-e4ef1.appspot.com",
+  messagingSenderId: "880958040339",
+  appId: "1:880958040339:web:61d49a751c03b2e6ab52e6",
+  measurementId: "G-MKN3EDRVNM"
+};
+        firebase.initializeApp(firebaseConfig);
+        </script>
+        <script>
+        var fileButton = document.getElementById("file");
+        fileButton.addEventListener('change', function(e){
+        var file = e.target.files[0];
+        var storageRef = firebase.storage().ref(file.name);
+        var task = storageRef.put(file);
+        task.on('state_changed', function progress(snapshot) {
 
-        //prevent Default functionality
-        e.preventDefault();
+  }, function error(err) {
 
-        //get the action-url of the form
-        var actionurl = e.currentTarget.action;
 
-        //do your own request an handle the results
-        $.ajax({
-                url: actionurl,
-                type: 'post',
-                data: formData,
-                contentType: false,
-                processData: false,
-                statusCode: {
-                  200: function(){alert("Admin account has been created.");
-                    location.reload();},
-                  400: function(){alert("Admin accounts already exists.");
-                location.reload();
-              }
-                }
+  },function complete() {
 
-                
+  });
         });
-
-    });
-
-});
-      </script>
+        </script>
       <script src="/stylesheets/bookNew/js/admin.js"></script>
 </body>
 </html>

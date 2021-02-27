@@ -177,6 +177,18 @@ app.post("/adminDelete",function(req,res){
    
 });
 
+app.post("/booksDelete",function(req,res){
+  processes = []
+  for(i = 0; i<req.body.length;i++){
+    let userFirestore = db.collection("Books").doc(req.body[i])
+    processes.push(userFirestore.delete())
+  }
+  Promise.all(processes).then(res.send.bind(res))
+  for(i = 0; i< req.body.length;i++){
+    console.log(req.body[i])
+  } 
+   
+});
 app.post("/adminUserList",function(req,res){
   res.render("adminUserList")
 

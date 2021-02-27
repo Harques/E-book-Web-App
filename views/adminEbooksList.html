@@ -138,16 +138,16 @@
             alert("You can not delete all books")
           }
           else{
-            var deleteAccounts = []
+            var deleteBooks = []
           for(i = 0; i<temp.length;i++){
-            deleteAccounts.push(temp[i].firstChild.innerHTML)
-            console.log(temp[i].firstChild.innerHTML)
+            deleteBooks.push(temp[i].lastChild.innerHTML)
+            console.log(temp[i].lastChild.innerHTML)
           }
           $.post({
         traditional: true,
-        url: '/adminDelete',
+        url: '/booksDelete',
         contentType: 'application/json',
-        data: JSON.stringify(deleteAccounts),
+        data: JSON.stringify(deleteBooks),
         dataType: 'json',
         success: function(response){if(response)location.reload()}
 } );

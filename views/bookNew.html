@@ -27,6 +27,7 @@
                 <li><form action="/adminEbooksList" method="post"><a href="#"><button type="submit" style="background-color:#1a1a1a;">eBooks List</button></a></form></li>
                 <li><form action="/adminAdminList" method="post"><a href="#"><button type="submit" style="background-color:#1a1a1a;">Admin List</button></a></form></li>
                 <li><form action="/adminUserList" method="post"><a href="#"><button type="submit" style="background-color:#1a1a1a;">User List</button></a></form></li>
+                <li><form action="/" method="get"><a href="#"><button type="submit" style="background-color:#1a1a1a;">Logout</button></a></form></li>
             </ul>
         </nav>
         <!-- /#sidebar-wrapper -->
@@ -108,6 +109,7 @@
         var fileButton = document.getElementById("fileSubmit");
         fileButton.addEventListener('click', function(e){
         var file = document.getElementById('file').files[0];
+        var language = document.getElementById('language').value;
         console.log(file === undefined);
         if(file === undefined) {
           alert("No files found.");
@@ -115,35 +117,55 @@
         }
         else{
           var fileName = file.name;
-          if(fileName.split('.').pop() != "pdf"){
+          if(fileName.split('.').pop() != "pdf" || language == ""){
             alert("File is not acceptable.");
             location.reload();
           }
         }
-        var language = document.getElementById('language').value;
-        console.log(language);
-        var storageRef = firebase.storage().ref(file.name);
-        var task = storageRef.put(file);
-        task.on('state_changed', function progress(snapshot) {
-
-  }, function error(err) {
-
-  },function complete() {
-    var documentID = ""
+        var fileNameSplit = fileName.split('.');
+        fileNameSplit.pop();
+        fileName = fileNameSplit.join('');
+        var documentID = ""
           var letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","0","1","2","3","4","5","6","7","8","9"]
-          for (i = 0; i<20; i++){
+          documentID += letters[Math.floor(Math.random()*26)];
+          for (i = 0; i<19; i++){
             var index = Math.floor(Math.random()*36)
             documentID += letters[index];
           }
-          const bookData = {
+        const collection = firebase.firestore().collection("Books")
+        collection.where('title', '==', fileName).get().then((bookCheck)=>{
+          if(bookCheck.empty){
+            var storageRef = firebase.storage().ref(documentID+".pdf");
+
+            const bookData = {
             id: documentID,
             language: language,
-            title: file.name
-        }
-    firebase.firestore().collection("Books").doc(documentID).set(bookData);
-    alert("File has been uploaded.");
-    location.reload();
-  });
+            title: fileName
+            }
+            firebase.firestore().collection("Books").doc(documentID).set(bookData)
+            var task = storageRef.put(file);
+            task.on('state_changed', function progress(snapshot) {
+
+            }, function error(err) {
+
+            },function complete() {
+alert("File has been uploaded.");
+location.reload();
+});
+            }
+          else{
+            alert("File already exists in the database")
+            location.reload();
+          }
+          });
+          
+
+
+
+       
+
+        
+        
         });
         </script>
       <script src="/stylesheets/bookNew/js/admin.js"></script>

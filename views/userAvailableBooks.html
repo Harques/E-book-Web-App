@@ -19,7 +19,7 @@
         <ul class="nav sidebar-nav">
             <li class="sidebar-brand">
                 <a href="#">
-                   Brand
+                   Wuhan
                 </a>
             </li>
 
@@ -41,7 +41,7 @@
               <a href="./userPDFReader">Home</a>
           </li>
             <li>
-              <a href="https://twitter.com/maridlcrmn">Follow me</a>
+              <a href="/">Logout</a>
           </li>
 
         </ul>
@@ -210,7 +210,11 @@ $(document).ready(function(){
 </script>
 <script>
   $.get("/credentials",function(data,status){
-      console.log(data);
+      for(i = 0; i<data.length;i++){
+        $(document).ready(function(){
+          $("#credentials").append("<li><a href=\"#\">"+data[i].join("")+"</a></li>")
+        })
+      }
   });
 </script>
 </body>

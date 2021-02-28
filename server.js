@@ -9,6 +9,7 @@ require("firebase/storage")
 const bcrypt = require("bcrypt");
 var admin = require("./admin");
 const formidable = require('formidable');
+const { bucket } = require('firebase-functions/lib/providers/storage');
 
 
 
@@ -98,10 +99,19 @@ app.get("/library",function(req,res){
       });
 });
 app.get("/credentials",function(req,res){
+  userCredentials = [];
   let userFirestore = db.collection("Users").doc(userID);
   userFirestore.get().then((credentials) =>{
-    console.log(credentials.data())
-    res.send(credentials.data());
+    userCredentials.push([])
+    userCredentials[0][0] = "Country: "
+    userCredentials[0][1] = credentials.get("country")
+    userCredentials.push([])
+    userCredentials[1][0] = "Age: "
+    userCredentials[1][1] = credentials.get("age")
+    userCredentials.push([])
+    userCredentials[2][0] = "Gender: "
+    userCredentials[2][1] = credentials.get("gender")
+    res.send(userCredentials);
   });
 });
 app.get("/adminListing",function(req,res){
@@ -181,12 +191,25 @@ app.post("/booksDelete",function(req,res){
   processes = []
   for(i = 0; i<req.body.length;i++){
     let userFirestore = db.collection("Books").doc(req.body[i])
-    processes.push(userFirestore.delete())
+    var pdfDelete = req.body[i];
+    userFirestore.get().then((doc)=>{
+      admin.bucket.file(pdfDelete+".pdf").delete();
+      //let storageRef = storage.ref().child(doc.get("title") +".pdf")
+      //storageRef.delete()
+      processes.push(userFirestore.delete())
+    })
   }
-  Promise.all(processes).then(res.send.bind(res))
-  for(i = 0; i< req.body.length;i++){
-    console.log(req.body[i])
-  } 
+  var wait = setInterval(function(){
+    if(processes.length === req.body.length){
+      console.log(processes)
+      Promise.all(processes).then(res.send.bind(res))
+      for(i = 0; i< req.body.length;i++){
+        console.log(req.body[i])
+      }
+      clearInterval(wait)
+    }
+  },500)
+   
    
 });
 app.post("/adminUserList",function(req,res){
@@ -287,67 +310,7 @@ app.post("/create", function(req,res){
   
 
 })
-/*
-app.post('/bookNewFile',(req, res) => {
-  console.log(req.body.file.path);
-  if(!req.body.file) {
-      res.status(400).send("Error: No files found")
-  
-  }
-  else if(req.body.file.split('.').pop() != "pdf"){
-      res.status(400).send("Error: File is not acceptable.");
-  }
-  /*else if(firebase.bucket.file(req.body.file).exists()){
-      res.status(400).send("Error: File already exists in the server.");
-  }*/
-  /*else {
-          var book = req.body.file.split(".");
-          book.pop();
-          /*const blob = bucket.file(req.body.file)
-          
-          const blobWriter = blob.createWriteStream({
-              metadata: {
-                  contentType: req.body.file.mimetype
-              }
-          })
-          
-          blobWriter.on('error', (err) => {
-              console.log(err)
-          })
-          
-          blobWriter.on('finish', () => {
-              res.status(200).send("File uploaded.")
-          })
-          
-          blobWriter.end(req.body.file.buffer)*/
-          /*var storageRef = storage.ref(req.body.file)
-          var task = storageRef.put(req.body.file)
-          task.on('state_changed', function progress(snapshot) {
-            //var percentage = (snapshot.bytesTransferred/snapshot.totalBytes)*100;
-            //uploader.value = percentage;
-        
-          }, function error(err) {
-        
-        
-          },function complete() {
-        
-          });
-          //bucket.upload(req.body.file)
-          var documentID = ""
-          var letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","0","1","2","3","4","5","6","7","8","9"]
-          for (i = 0; i<20; i++){
-            var index = Math.floor(Math.random()*36)
-            documentID += letters[index];
-          }
-          const bookData = {
-            id: documentID,
-            language: req.body.language,
-            title: book.join()
-        }
-          db.collection("Books").doc(documentID).set(bookData);
-      
-  }
-})*/
+
 
 app.listen(4000,function(){
     console.log("Server is running");

@@ -6,10 +6,7 @@ var firebase = require('firebase/app');
 require("firebase/auth");
 require("firebase/firestore");
 require("firebase/storage")
-const bcrypt = require("bcrypt");
 var admin = require("./admin");
-const formidable = require('formidable');
-const { bucket } = require('firebase-functions/lib/providers/storage');
 
 
 

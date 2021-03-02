@@ -7,6 +7,8 @@ require("firebase/auth");
 require("firebase/firestore");
 require("firebase/storage")
 var admin = require("./admin");
+const querystring = require('querystring')
+global.XMLHttpRequest = require("xhr2")
 
 
 
@@ -14,7 +16,6 @@ var admin = require("./admin");
 //var serviceAccount = require("./service-account-file.json");
 let ownedBooks = []
 
-var userID;
 var firebaseConfig = {
   apiKey: "AIzaSyB8qtYqUk95tgv1dtIp1e-VUayLgaomHYU",
   authDomain: "e-book-app-e4ef1.firebaseapp.com",
@@ -40,7 +41,6 @@ app.use(express.static(__dirname+'/public'));
 var credentials;
 app.get("/", function(req,res){
     res.render("index");
-    //db.collection("Users").doc().set({farkmaz: "naber"});
 });
 app.get("/userPDFReader",function(req,res){
     res.render("userPDFReader")
@@ -50,7 +50,8 @@ app.get("/admin",function(req,res){
 });
 
 app.get("/userAvailableBooks",function(req,res){
-  res.render("userAvailableBooks")
+  id = req.query.uid
+  res.render("userAvailableBooks", {id: id})
 });
 
 app.get("/intoLogin",function(req,res){
@@ -67,7 +68,7 @@ app.post("/login",function(req,res){
       console.log("Girdim ya sakin");
       userID = user.uid;
       console.log(userID);
-      res.render("userPDFReader");
+      res.render("userAvailableBooks", {id: user.uid});
       
       // ...
     })
@@ -83,21 +84,33 @@ app.get("/intoCreate",function(req,res){
   res.render("create")
 });
 app.get("/library",function(req,res){
+  let id = req.query.uid
   ownedBooks = [];
-  let userFirestore = db.collection("Users").doc(userID);
+  let userFirestore = db.collection("Users").doc(id);
       userFirestore.get().then((books) =>{
+      processes = [];
       var data = books.get("ebooks");
+      var counter = 0;
         for(var key in data){
           if (data.hasOwnProperty(key) ){
-            ownedBooks.push(key);
+            let userBooks = db.collection("Books").doc(key);
+            processes.push(userBooks.get().then((title)=>{
+            var booktitle = title.get("title")
+            ownedBooks.push([])
+            ownedBooks[counter][0] = key
+            ownedBooks[counter++][1] = booktitle
+            }))
           }
         }
-        res.send(ownedBooks);
+        Promise.all(processes).then(function(){
+          res.send(ownedBooks)
+        });
       });
 });
 app.get("/credentials",function(req,res){
+  let id = req.query.uid
   userCredentials = [];
-  let userFirestore = db.collection("Users").doc(userID);
+  let userFirestore = db.collection("Users").doc(id);
   userFirestore.get().then((credentials) =>{
     userCredentials.push([])
     userCredentials[0][0] = "Country: "
@@ -110,6 +123,29 @@ app.get("/credentials",function(req,res){
     userCredentials[2][1] = credentials.get("gender")
     res.send(userCredentials);
   });
+});
+app.get("/getBook",function(req,res){
+  let book = req.query.book
+  let id = req.query.uid
+  console.log(book)
+  let storageRef = storage.ref(book + ".pdf")
+  storageRef.getDownloadURL().then((url)=>{
+    console.log(url)
+    let userFirestore = db.collection("Users").doc(id)
+    userFirestore.get().then((books)=>{
+      var data = books.get("ebooks");
+      for(let [key,value] of Object.entries(data)){
+        bookString = book.toString()
+        if(bookString.trim().localeCompare(key.trim()) == 0){
+          console.log(key+':'+value);
+          res.render("userPDFReader",{pageNumber: value, pdfURL: url, id: id, book: book})
+          
+        }
+      }
+    })
+  })
+
+  console.log(book);
 });
 app.get("/adminListing",function(req,res){
   const documents = [];
@@ -163,6 +199,8 @@ app.post("/adminlogin",function(req,res){
       if(data == req.body.pass){
         res.render("adminBackend");
       }
+    }).catch((err)=>{
+      console.log(err)
     });
   }
   catch{
@@ -191,8 +229,6 @@ app.post("/booksDelete",function(req,res){
     var pdfDelete = req.body[i];
     userFirestore.get().then((doc)=>{
       admin.bucket.file(pdfDelete+".pdf").delete();
-      //let storageRef = storage.ref().child(doc.get("title") +".pdf")
-      //storageRef.delete()
       processes.push(userFirestore.delete())
     })
   }

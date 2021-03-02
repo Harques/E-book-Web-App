@@ -38,7 +38,7 @@
               </ul>
             </li>
             <li>
-              <a href="./userPDFReader">Home</a>
+              <a id="availableBooks" href="">Available Books</a>
           </li>
             <li>
               <a href="/">Logout</a>
@@ -200,22 +200,29 @@ $(document).ready(function(){
 });
 </script>
 <script>
-  $.get("/library",function(data,status){
-    for(i = 0; i<data.length;i++){
-      $(document).ready(function(){
-        $("#library").append("<li><a href=\"#\">"+data[i]+"</a></li>")
-      })
-    }
-  });
+  var userID = "<%= id %>";
+        $.get("/library?uid="+ userID,function(data,status){
+          for(i = 0; i<data.length;i++){
+            $(document).ready(function(){
+              var url = '/getBook?book=' + data[i][0] + '&uid='+ userID
+              $("#library").append('<li><a class=\'books\' href='+ url +'>'+data[i][1]+"</a></li>")
+            })
+          }
+        });
 </script>
 <script>
-  $.get("/credentials",function(data,status){
+  var userID = "<%= id %>";
+  $.get("/credentials?uid=" + userID,function(data,status){
       for(i = 0; i<data.length;i++){
         $(document).ready(function(){
           $("#credentials").append("<li><a href=\"#\">"+data[i].join("")+"</a></li>")
         })
       }
   });
+</script>
+<script>
+  var userID = "<%= id %>";
+  $('#availableBooks').attr("href", "/userAvailableBooks?uid=" + userID);
 </script>
 </body>
 </html>

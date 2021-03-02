@@ -22,15 +22,15 @@ html { height: 100%;}
 }
 
 #wrapper.toggled {
-    padding-left: 220px;
+    padding-left: 300px;
 }
 
 #sidebar-wrapper {
     z-index: 1000;
-    left: 220px;
+    left: 300px;
     width: 0;
     height: 100%;
-    margin-left: -220px;
+    margin-left: -300px;
     overflow-y: auto;
     overflow-x: hidden;
     background: #1a1a1a;
@@ -45,7 +45,7 @@ html { height: 100%;}
 }
 
 #wrapper.toggled #sidebar-wrapper {
-    width: 220px;
+    width: 300px;
 }
 
 #page-content-wrapper {
@@ -55,7 +55,7 @@ html { height: 100%;}
 
 #wrapper.toggled #page-content-wrapper {
     position: absolute;
-    margin-right: -220px;
+    margin-right: -300px;
 }
 
 /*-------------------------------*/
@@ -65,7 +65,7 @@ html { height: 100%;}
 .sidebar-nav {
     position: absolute;
     top: 0;
-    width: 220px;
+    width: 300px;
     margin: 0;
     padding: 0;
     list-style: none;

@@ -1,4 +1,8 @@
-var url = 'https://firebasestorage.googleapis.com/v0/b/e-book-app-e4ef1.appspot.com/o/05180000116.pdf?alt=media&token=98968b67-316e-409d-b835-a74fc1556956';
+var page = document.currentScript.getAttribute('page'); //1
+var bookurl = document.currentScript.getAttribute('bookUrl'); //2
+
+
+var url = bookurl
 
 var pdfjsLib = window['pdfjs-dist/build/pdf'];
 

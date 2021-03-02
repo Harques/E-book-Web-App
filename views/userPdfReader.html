@@ -36,7 +36,7 @@
                   </ul>
                 </li>
                 <li>
-                  <a href="./userAvailableBooks">Available Books</a>
+                  <a id="availableBooks" href="">Available Books</a>
                 </li>
                 <li>
                     <a href="/">Logout</a>
@@ -60,6 +60,7 @@
                             <button id="next">Next page</button>
                           
                             <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
+                            <button id ="save">Save</button>
                           </div>
                         <canvas id ="pdf-render"></canvas>
                     </div>
@@ -103,24 +104,147 @@
         });  
       });
       </script>
+      <script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-app.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-firestore.js"></script>
       <script>
-        $.get("/library",function(data,status){
+        var firebaseConfig = {
+  apiKey: "AIzaSyB8qtYqUk95tgv1dtIp1e-VUayLgaomHYU",
+  authDomain: "e-book-app-e4ef1.firebaseapp.com",
+  projectId: "e-book-app-e4ef1",
+  storageBucket: "e-book-app-e4ef1.appspot.com",
+  messagingSenderId: "880958040339",
+  appId: "1:880958040339:web:61d49a751c03b2e6ab52e6",
+  measurementId: "G-MKN3EDRVNM"
+};
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+      </script>
+<script>
+  var userID = "<%= id %>";
+        $.get("/library?uid="+ userID,function(data,status){
           for(i = 0; i<data.length;i++){
             $(document).ready(function(){
-              $("#library").append("<li><a href=\"#\">"+data[i]+"</a></li>")
+              var url = '/getBook?book=' + data[i][0] + '&uid='+ userID
+              $("#library").append('<li><a class=\'books\' href='+ url +'>'+data[i][1]+"</a></li>")
             })
           }
         });
-      </script>
-      <script>
-      $.get("/credentials",function(data,status){
+</script>
+<script>
+  var userID = "<%= id %>";
+  $.get("/credentials?uid=" + userID,function(data,status){
       for(i = 0; i<data.length;i++){
         $(document).ready(function(){
           $("#credentials").append("<li><a href=\"#\">"+data[i].join("")+"</a></li>")
         })
       }
-      });
-      </script>
-      <script src="/stylesheets/userPDFReader/js/main.js"></script>
+  });
+</script>
+<script>
+  var userID = "<%= id %>";
+  $('#availableBooks').attr("href", "/userAvailableBooks?uid=" + userID);
+</script>
+      
+<script>
+  var page = "<%= pageNumber %>";
+  var bookUrl = "<%= pdfURL %>";
+  var userID = "<%= id %>";
+  var book = "<%= book %>";
+
+var url = bookUrl
+
+var pdfjsLib = window['pdfjs-dist/build/pdf'];
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';
+
+var pdfDoc = null,
+    pageNum = parseInt(page,10),
+    pageRendering = false,
+    pageNumPending = null,
+    scale = 1.25,
+    canvas = document.getElementById('pdf-render'),
+    ctx = canvas.getContext('2d');
+
+
+function renderPage(num) {
+  pageRendering = true;
+
+  pdfDoc.getPage(num).then(function(page) {
+    var viewport = page.getViewport({scale: scale});
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+
+    var renderContext = {
+      canvasContext: ctx,
+      viewport: viewport
+    };
+    var renderTask = page.render(renderContext);
+
+    renderTask.promise.then(function() {
+      pageRendering = false;
+      if (pageNumPending !== null) {
+        renderPage(pageNumPending);
+        pageNumPending = null;
+      }
+    });
+  });
+
+  document.getElementById('page_num').textContent = num;
+}
+
+
+function queueRenderPage(num) {
+  if (pageRendering) {
+    pageNumPending = num;
+  } else {
+    renderPage(num);
+  }
+}
+
+/**
+ * show previous page
+ */
+function onPrevPage() {
+  if (pageNum > 1) {
+    pageNum--;
+    queueRenderPage(pageNum);
+  }
+}
+
+document.getElementById('prev').addEventListener('click', onPrevPage);
+
+/**
+ * show next page
+ */
+function onNextPage() {
+  if (pageNum < pdfDoc.numPages) {
+    pageNum++;
+    queueRenderPage(pageNum);
+  }
+}
+
+document.getElementById('next').addEventListener('click', onNextPage);
+
+/**
+ * PDF async "download".
+ */
+pdfjsLib.disableWorker = true;
+pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
+  //Set loaded PDF to main pdfDoc variable
+  pdfDoc = pdfDoc_;
+  //Show number of pages in document
+  document.getElementById('page_count').textContent = pdfDoc.numPages;
+
+  renderPage(pageNum);
+  
+});
+$(function(){
+  $('#save').click(function(){
+  let userFirestore = firebase.firestore().collection("Users").doc(userID)
+  userFirestore.update({['ebooks.'+book]:pageNum})
+});
+});
+
+</script>
 </body>
 </html>

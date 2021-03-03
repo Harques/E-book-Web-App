@@ -21,9 +21,6 @@
                        Admin Access
                     </a>
                 </li>
-                <li>
-                  <form action="/adminBackend" method="post"><a href="#"><button type="submit" style="background-color:#1a1a1a;">Statistics</button></a></form>
-                </li>
                 <li><form action="/adminEbooksList" method="post"><a href="#"><button type="submit" style="background-color:#1a1a1a;">eBooks List</button></a></form></li>
                 <li><form action="/adminAdminList" method="post"><a href="#"><button type="submit" style="background-color:#1a1a1a;">Admin List</button></a></form></li>
                 <li><form action="/adminUserList" method="post"><a href="#"><button type="submit" style="background-color:#1a1a1a;">User List</button></a></form></li>
@@ -41,17 +38,28 @@
             </button>
             <div class="container">
                     <div class="col-lg-8">
-                        <h1>eBook Title List</h1>
+                        <h1>eBook Information List</h1>
                         <table id="books">
                             <tr>
                             <th>
-                                <span class="a">eBook Title</span>
+                                <span class="a">Title</span>
                             </th>       
                             <th>
                                 <span class="a">Language</span>
                             </th>
                             <th>
-                              <span class="a">eBook ID</span>
+                              <span class="a">Description</span>
+                          </th>
+                            <th>
+                              <span class="a">ID</span>
+                          </th>
+                          <th>
+                            <span class="a">Price</span>
+                        </th>
+                          <th>
+                            <form action="/bookEdit" method="post">
+                              <button class="b" type="submit">Edit</button>
+                              </form>
                           </th>
                             <th>
                                 <button class="b" id="delete">Delete</button>
@@ -73,7 +81,6 @@
             
           
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function () {
         var trigger = $('.hamburger'),
@@ -112,8 +119,10 @@
                     $("#books").append("<tr id=\"" +i+"\"></tr>")
                     $("#"+i).append("<td>"+data[i].title+"</td>")
                     $("#"+i).append("<td>"+data[i].language+"</td>")
+                    $("#"+i).append("<td>"+data[i].description+"</td>")
                     $("#"+i).append("<td>"+data[i].id+"</td>")
-                }
+                    $("#"+i).append("<td>"+data[i].price+"</td>")
+                  }
             })
                 for(i=0; i<data.length;i++){
                     document.getElementById(i).addEventListener('click',highlight);

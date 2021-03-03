@@ -21,9 +21,6 @@
                        Admin Access
                     </a>
                 </li>
-                <li>
-                  <form action="/adminBackend" method="post"><a href="#"><button type="submit" style="background-color:#1a1a1a;">Statistics</button></a></form>
-                </li>
                 <li><form action="/adminEbooksList" method="post"><a href="#"><button type="submit" style="background-color:#1a1a1a;">eBooks List</button></a></form></li>
                 <li><form action="/adminAdminList" method="post"><a href="#"><button type="submit" style="background-color:#1a1a1a;">Admin List</button></a></form></li>
                 <li><form action="/adminUserList" method="post"><a href="#"><button type="submit" style="background-color:#1a1a1a;">User List</button></a></form></li>
@@ -42,21 +39,28 @@
             <div class="container">
                     <div class="col-lg-8">
                         <h1>New eBook File</h1>
-                          <input class="newFile" type="file" value="upload" name="file" id="file">
+                        <label for="book"><h2 class="newFile">Book PDF</h2></label>
+                          <input class="newFile" type="file" value="upload" name="book" id="book">
+                          <input class="newFile" type="text" name="title" id="title" placeholder="Title:">
                           <input class="newFile" type="text" name="language" id="language" placeholder="Language:">
+                          <input class="newFile" type="text" name="description" id="description" placeholder="Description:">
+                          <input class="newFile" type="text" name="price" id="price" placeholder="Price:">
+                          <label for="cover"><h2 class="newFile">Cover Image</h2></label>
+                          <input class="newFile" type="file" value="upload" name="cover" id="cover">
                           <button id="fileSubmit" class="b" type="submit">Submit</button>
+                          <div style="visibility: hidden;"" id="uploading" class="loader"></div>
+                          <h2 id ="warning" style="color:red; visibility: hidden;"></h2>
                           
                         </div>
             </div>
         </div>
         <!-- /#page-content-wrapper -->
     
-    </div>
+    
     <!-- /#wrapper -->
             
           
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function () {
         var trigger = $('.hamburger'),
@@ -108,23 +112,34 @@
         <script>
         var fileButton = document.getElementById("fileSubmit");
         fileButton.addEventListener('click', function(e){
-        var file = document.getElementById('file').files[0];
+        document.getElementById('uploading').style.visibility = 'visible'
+        var book = document.getElementById('book').files[0];
+        var title = document.getElementById('title').value;
         var language = document.getElementById('language').value;
-        console.log(file === undefined);
-        if(file === undefined) {
-          alert("No files found.");
+        var description = document.getElementById('description').value;
+        var cover = document.getElementById('cover').files[0];
+        var price = document.getElementById('price').value;
+        console.log(book === undefined);
+        if(book === undefined || cover === undefined) {
+          alert("File(s) is/are missing.");
           location.reload();
         }
         else{
-          var fileName = file.name;
-          if(fileName.split('.').pop() != "pdf" || language == ""){
-            alert("File is not acceptable.");
+          var bookName = book.name;
+          var coverName = cover.name;
+          console.log(coverName)
+          console.log(bookName)
+          if(bookName.split('.').pop() != "pdf" || !(coverName.split('.').pop() == 'png' || coverName.split('.').pop() == 'jpg' || coverName.split('.').pop() == 'jpeg') || language == "" || title == "" || description == "" || price == ""){
+            alert("Book is not acceptable.");
             location.reload();
           }
         }
-        var fileNameSplit = fileName.split('.');
+        var fileNameSplit = bookName.split('.');
         fileNameSplit.pop();
-        fileName = fileNameSplit.join('');
+        bookName = fileNameSplit.join('');
+        fileNameSplit = coverName.split('.');
+        coverExtension = fileNameSplit.pop();
+        coverName = fileNameSplit.join('');
         var documentID = ""
           var letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","0","1","2","3","4","5","6","7","8","9"]
           documentID += letters[Math.floor(Math.random()*26)];
@@ -133,39 +148,48 @@
             documentID += letters[index];
           }
         const collection = firebase.firestore().collection("Books")
-        collection.where('title', '==', fileName).get().then((bookCheck)=>{
+        collection.where('title', '==', bookName).get().then((bookCheck)=>{
           if(bookCheck.empty){
+            
             var storageRef = firebase.storage().ref(documentID+".pdf");
 
             const bookData = {
             id: documentID,
             language: language,
-            title: fileName
+            title: title,
+            description: description,
+            price: price
             }
             firebase.firestore().collection("Books").doc(documentID).set(bookData)
-            var task = storageRef.put(file);
+            var task = storageRef.put(book);
             task.on('state_changed', function progress(snapshot) {
 
             }, function error(err) {
 
             },function complete() {
-alert("File has been uploaded.");
-location.reload();
-});
+              var storageRef2 = firebase.storage().ref(documentID+"cover."+coverExtension)
+              var task2 = storageRef2.put(cover);
+              task2.on('state_changed', function progress(){
+
+              },
+              function error(err){
+
+              },
+              function complete() {
+                document.getElementById('uploading').style.visibility = 'hidden'
+              document.getElementById('warning').innerHTML = "You need to add this id as an in-app purchase id: " + documentID;
+              document.getElementById('warning').style.visibility = 'visible'
+              alert("Files have been uploaded.");
+              });
+              
+            });
             }
           else{
-            alert("File already exists in the database")
+            alert("Book already exists in the database")
             location.reload();
           }
           });
-          
 
-
-
-       
-
-        
-        
         });
         </script>
       <script src="/stylesheets/bookNew/js/admin.js"></script>

@@ -55,10 +55,20 @@ app.get("/userAvailableBooks",function(req,res){
 });
 
 app.get("/intoLogin",function(req,res){
-    res.render("login");
+    res.render("login",{error:false});
+});
+
+app.get("/intoBooks",function(req,res){
+  res.render("books")
+
 })
+
+
+app.get("/forgotPassword",function(req,res){
+  res.render("forgotPassword")
+});
+
 app.post("/login",function(req,res){
-    console.log("naber");
     console.log(req.body.email);
     console.log(req.body.pass);
     firebase.auth().signInWithEmailAndPassword(req.body.email, req.body.pass)
@@ -75,11 +85,26 @@ app.post("/login",function(req,res){
     .catch((error) => {
       var errorCode = error.code;
       var errorMessage = error.message;
-      res.send("giremedim abi")
+      res.render("login", {error:true})
       console.log("Giremeeeeediiiiiiiiim");
     });
 
 });
+
+app.post("/sendEmail",function(req,res){
+  firebase.auth().sendPasswordResetEmail(req.body.email).then(function(){
+    res.status(200).send("OK");
+
+  }).catch(function(error){
+    var errorCode = error.code;
+    var errorMessage = error.message;
+
+    console.log(errorCode);
+    console.log(errorMessage);
+    res.status(409).send("Failed")
+  })
+});
+
 app.get("/intoCreate",function(req,res){
   res.render("create")
 });
@@ -197,7 +222,7 @@ app.post("/adminlogin",function(req,res){
     userFirestore.get().then((password) =>{
     var data = password.get("password");
       if(data == req.body.pass){
-        res.render("adminBackend");
+        res.render("adminUserList");
       }
     }).catch((err)=>{
       console.log(err)
@@ -264,6 +289,9 @@ app.post("/adminNew",function(req,res){
 app.post("/adminEdit",function(req,res){
   res.render("adminEdit")
 });
+app.post("/bookEdit",function(req,res){
+  res.render("bookEdit")
+});
 app.post("/adminNewAccount",function(req,res){
   console.log(req.body.user)
   let userFirestore = db.collection("Admins").doc(req.body.user);
@@ -325,7 +353,7 @@ app.post("/create", function(req,res){
         userId: user.uid
     }
     db.collection("Users").doc(userData.userId).set(userData).then(()=>{
-      console.log("oldu")
+      res.render("userAvailableBooks", {id:userData.userID})
     }).catch(() =>{
       console.log("olmadı")
     });

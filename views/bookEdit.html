@@ -7,11 +7,7 @@
     <title>Admin</title>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-    <script src="https://code.highcharts.com/highcharts.js"></script>
-    <script src="https://code.highcharts.com/modules/exporting.js"></script>
-    <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="/stylesheets/adminBackend/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/bookEdit/css/styles.css">
 </head>
 <body>
     <div id="wrapper">
@@ -24,9 +20,6 @@
                     <a href="#">
                        Admin Access
                     </a>
-                </li>
-                <li>
-                  <form action="/adminBackend" method="post"><a href="#"><button type="submit" style="background-color:#1a1a1a;">Statistics</button></a></form>
                 </li>
                 <li><form action="/adminEbooksList" method="post"><a href="#"><button type="submit" style="background-color:#1a1a1a;">eBooks List</button></a></form></li>
                 <li><form action="/adminAdminList" method="post"><a href="#"><button type="submit" style="background-color:#1a1a1a;">Admin List</button></a></form></li>
@@ -45,8 +38,19 @@
             </button>
             <div class="container">
                     <div class="col-lg-8">
-                      <div id="container" style="min-width: 310px; max-width: 800px; height:600px; margin: 0 auto"></div>
-                    </div>
+                        <h1>Edit Admin Account</h1>
+                        <form action="/adminEditBook" method="post" id="editBook">
+                          <input class="editBook" type="text" name="bookID" id="bookID" placeholder="Book ID:">
+                          <input class="editBook" type="text" name="title" id="title" placeholder="Title:">
+                          <input class="editBook" type="text" name="description" id="description" placeholder="Description:">
+                          <input class="editBook" type="text" name="language" id="language" placeholder="Language:">
+                          <input class="editBook" type="text" name="price" id="price" placeholder="Price:">
+                          <label for="cover"><h2 class="editBook">Cover Image</h2></label>
+                          <input class="editBook" type="file" value="upload" name="cover" id="cover">
+                          <button class="b" type="submit">Save</button>
+                        </form>
+                          
+                        </div>
             </div>
         </div>
         <!-- /#page-content-wrapper -->
@@ -56,7 +60,6 @@
             
           
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function () {
         var trigger = $('.hamburger'),
@@ -87,89 +90,38 @@
         });  
       });
       </script>
+
       <script>
-        // Data gathered from http://populationpyramid.net/germany/2015/
+      $(function() {
+    //hang on event of form with id=myform
+    $("#editAccount").submit(function(e) {
 
-// Age categories
-var categories = [
-    '0-4', '5-9', '10-14', '15-19',
-    '20-24', '25-29', '30-34', '35-39', '40-44',
-    '45-49', '50-54', '55-59', '60-64', '65-69',
-    '70-74', '75-79', '80-84', '85-89', '90-94',
-    '95-99', '100 + '
-];
+        //prevent Default functionality
+        e.preventDefault();
 
-Highcharts.chart('container', {
-    chart: {
-        type: 'bar'
-    },
-    title: {
-        text: 'Population pyramid for Germany, 2018'
-    },
-    subtitle: {
-        text: 'Source: <a href="http://populationpyramid.net/germany/2018/">Population Pyramids of the World from 1950 to 2100</a>'
-    },
-    xAxis: [{
-        categories: categories,
-        reversed: false,
-        labels: {
-            step: 1
-        }
-    }, { // mirror axis on right side
-        opposite: true,
-        reversed: false,
-        categories: categories,
-        linkedTo: 0,
-        labels: {
-            step: 1
-        }
-    }],
-    yAxis: {
-        title: {
-            text: null
-        },
-        labels: {
-            formatter: function () {
-                return Math.abs(this.value) + '%';
-            }
-        }
-    },
+        //get the action-url of the form
+        var actionurl = e.currentTarget.action;
+        //do your own request an handle the results
+        $.ajax({
+                url: actionurl,
+                type: 'post',
+                dataType: 'application/json',
+                data: $("#editAccount").serialize(),
+                statusCode: {
+                  200: function(){alert("Admin account's password has been changed.");
+                    location.reload();},
+                  409: function(){alert("Admin account does not exist.");
+                location.reload();
+              }
+                }
 
-    plotOptions: {
-        series: {
-            stacking: 'normal'
-        }
-    },
+                
+        });
 
-    tooltip: {
-        formatter: function () {
-            return '<b>' + this.series.name + ', age ' + this.point.category + '</b><br/>' +
-                'Population: ' + Highcharts.numberFormat(Math.abs(this.point.y), 2);
-        }
-    },
+    });
 
-    series: [{
-        name: 'Male',
-        data: [
-            -2.2, -2.1, -2.2, -2.4,
-            -2.7, -3.0, -3.3, -3.2,
-            -2.9, -3.5, -4.4, -4.1,
-            -13.4, -2.7, -2.3, -2.2,
-            -1.6, -0.6, -0.3, -0.0,
-            -0.0
-        ]
-    }, {
-        name: 'Female',
-        data: [
-            2.1, 2.0, 2.1, 2.3, 2.6,
-            2.9, 3.2, 3.1, 2.9, 3.4,
-            14.3, 4.0, 3.5, 2.9, 2.5,
-            2.7, 2.2, 1.1, 0.6, 0.2,
-            0.0
-        ]
-    }]
 });
-
       </script>
+      <script src="/stylesheets/adminEdit/js/admin.js"></script>
 </body>
 </html>

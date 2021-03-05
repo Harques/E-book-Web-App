@@ -158,7 +158,8 @@
             language: language,
             title: title,
             description: description,
-            price: price
+            price: price,
+            cover: coverExtension
             }
             firebase.firestore().collection("Books").doc(documentID).set(bookData)
             var task = storageRef.put(book);

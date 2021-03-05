@@ -166,6 +166,7 @@ measurementId: "G-MKN3EDRVNM"
             }, function error(err) {
 
             },function complete() {
+              bookRef.update({cover:coverExtension})
               alert("The book has been updated.")
               document.getElementById('uploading').style.visibility = 'hidden'
               location.reload()

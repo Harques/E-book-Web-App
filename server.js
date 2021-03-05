@@ -59,8 +59,25 @@ app.get("/intoLogin",function(req,res){
 });
 
 app.get("/intoBooks",function(req,res){
-  
-  res.render("books")
+  const documents = [];
+  processes = [];
+  let userFirestore = db.collection("Books")
+  var counter = 0;
+  userFirestore.get().then((querySnapshot)=>{
+    querySnapshot.forEach((userDoc) => {
+      documents.push([])
+      var storageRef = storage.ref(userDoc.data().id+"cover."+userDoc.data().cover);
+      processes.push(storageRef.getDownloadURL().then((download)=>{
+        documents[counter][0] = userDoc.data().description
+        documents[counter++][1] = download
+      }))
+      console.log(userDoc.data())
+    })
+    Promise.all(processes).then(function(){
+      console.log("Documents: " + documents)
+      res.render("books",{books:documents})
+    });
+})
 
 })
 

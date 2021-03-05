@@ -177,9 +177,10 @@
               },
               function complete() {
                 document.getElementById('uploading').style.visibility = 'hidden'
-              document.getElementById('warning').innerHTML = "You need to add this id as an in-app purchase id: " + documentID;
-              document.getElementById('warning').style.visibility = 'visible'
-              alert("Files have been uploaded.");
+                document.getElementById('warning').innerHTML = "You need to add this id as an in-app purchase id: " + documentID;
+                document.getElementById('warning').style.visibility = 'visible'
+                alert("Files have been uploaded.");
+                location.reload()
               });
               
             });

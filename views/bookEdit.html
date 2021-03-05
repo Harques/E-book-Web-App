@@ -39,7 +39,6 @@
             <div class="container">
                     <div class="col-lg-8">
                         <h1>Edit Admin Account</h1>
-                        <form action="/adminEditBook" method="post" id="editBook">
                           <input class="editBook" type="text" name="bookID" id="bookID" placeholder="Book ID:">
                           <input class="editBook" type="text" name="title" id="title" placeholder="Title:">
                           <input class="editBook" type="text" name="description" id="description" placeholder="Description:">
@@ -47,8 +46,8 @@
                           <input class="editBook" type="text" name="price" id="price" placeholder="Price:">
                           <label for="cover"><h2 class="editBook">Cover Image</h2></label>
                           <input class="editBook" type="file" value="upload" name="cover" id="cover">
-                          <button class="b" type="submit">Save</button>
-                        </form>
+                          <button id="editBookSubmit" class="b" type="submit">Save</button>
+                          <div style="visibility: hidden;"" id="uploading" class="loader"></div>
                           
                         </div>
             </div>
@@ -90,38 +89,95 @@
         });  
       });
       </script>
+      <script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-app.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-firestore.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-storage.js"></script>
+<script>
+  // Initialize Firebase
+  var firebaseConfig = {
+apiKey: "AIzaSyB8qtYqUk95tgv1dtIp1e-VUayLgaomHYU",
+authDomain: "e-book-app-e4ef1.firebaseapp.com",
+projectId: "e-book-app-e4ef1",
+storageBucket: "e-book-app-e4ef1.appspot.com",
+messagingSenderId: "880958040339",
+appId: "1:880958040339:web:61d49a751c03b2e6ab52e6",
+measurementId: "G-MKN3EDRVNM"
+};
+  firebase.initializeApp(firebaseConfig);
+  </script>
+  <script>
+  var fileButton = document.getElementById("editBookSubmit");
+  fileButton.addEventListener('click', function(e){
+  document.getElementById('uploading').style.visibility = 'visible'
+  var cover = document.getElementById('cover').files[0];
+  var title = document.getElementById('title').value;
+  var language = document.getElementById('language').value;
+  var description = document.getElementById('description').value;
+  var bookID = document.getElementById('bookID').value;
+  var price = document.getElementById('price').value;
+  if(bookID == ""){
+    alert("Please enter a Book ID.")
+    location.reload()
+  }
+  else if(cover === undefined & title == "" & language == "" & description == "" & price == ""){
+    alert("There are no changes to be made.")
+    location.reload()
+  }
+  else{
+    const bookRef = firebase.firestore().collection("Books").doc(bookID)
+    bookRef.get().then((docSnapshot)=>{
+      if(!docSnapshot.exists){
+        alert("There is no book in the database with the given ID. Please enter a valid ID.")
+        location.reload()
+      }
+      else{
 
-      <script>
-      $(function() {
-    //hang on event of form with id=myform
-    $("#editAccount").submit(function(e) {
+        var data = {
+          title: (title == "") ? docSnapshot.get("title") : title,
+          language: (language == "") ? docSnapshot.get("language"): language,
+          price: (price == "") ? docSnapshot.get("price"): price,
+          description: (description == "") ? docSnapshot.get("description"):description
+        }
+        console.log("Title "+data.title)
+        console.log("Language "+data.language)
+        console.log("Price "+data.price)
+        console.log("Description "+data.description)
+        bookRef.update(data)
+        if(cover === undefined){
+          alert("The book has been updated.")
+          location.reload()
+        }
+        else{
+          var coverName = cover.name;
+          if(!(coverName.split('.').pop() == 'png' || coverName.split('.').pop() == 'jpg' || coverName.split('.').pop() == 'jpeg')){
+            alert("Cover image is not acceptable.")
+            location.reload()
+          }
+          else{
+            var fileNameSplit = coverName.split('.');
+            var coverExtension = fileNameSplit.pop();
+            var coverName = fileNameSplit.join('');
+          }
+          console.log(bookID+"cover."+coverExtension)
+          var storageRef = firebase.storage().ref(bookID+"cover."+coverExtension);
+          var task = storageRef.put(cover);
+            task.on('state_changed', function progress(snapshot) {
 
-        //prevent Default functionality
-        e.preventDefault();
+            }, function error(err) {
 
-        //get the action-url of the form
-        var actionurl = e.currentTarget.action;
-        //do your own request an handle the results
-        $.ajax({
-                url: actionurl,
-                type: 'post',
-                dataType: 'application/json',
-                data: $("#editAccount").serialize(),
-                statusCode: {
-                  200: function(){alert("Admin account's password has been changed.");
-                    location.reload();},
-                  409: function(){alert("Admin account does not exist.");
-                location.reload();
-              }
-                }
+            },function complete() {
+              alert("The book has been updated.")
+              document.getElementById('uploading').style.visibility = 'hidden'
+              location.reload()
+              
+            });
+        }
+      }
+    })
+  }
 
-                
-        });
-
-    });
-
-});
-      </script>
+  });
+  </script>
       <script src="/stylesheets/adminEdit/js/admin.js"></script>
 </body>
 </html>

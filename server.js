@@ -38,12 +38,13 @@ app.use(express.urlencoded({extended:true}));
 app.use(express.json());
 app.use(express.static(__dirname+'/public'));
 
-var credentials;
+
 app.get("/", function(req,res){
     res.render("index");
 });
 app.get("/userPDFReader",function(req,res){
-    res.render("userPDFReader")
+    id = req.query.uid
+    res.render("userPDFReader",{id:id})
 });
 app.get("/admin",function(req,res){
     res.render("admin")
@@ -58,6 +59,11 @@ app.get("/intoLogin",function(req,res){
     res.render("login",{error:false});
 });
 
+app.get("/userEditAccount",function(req,res){
+  id = req.query.uid
+  res.render("userEditAccount",{id:id})
+})
+
 app.get("/intoBooks",function(req,res){
   const documents = [];
   processes = [];
@@ -69,7 +75,8 @@ app.get("/intoBooks",function(req,res){
       var storageRef = storage.ref(userDoc.data().id+"cover."+userDoc.data().cover);
       processes.push(storageRef.getDownloadURL().then((download)=>{
         documents[counter][0] = userDoc.data().description
-        documents[counter++][1] = download
+        documents[counter][1] = download
+        documents[counter++][2] = userDoc.data().title
       }))
       console.log(userDoc.data())
     })
@@ -96,8 +103,37 @@ app.post("/login",function(req,res){
       console.log("Girdim ya sakin");
       userID = user.uid;
       console.log(userID);
-      res.render("userAvailableBooks", {id: user.uid});
-      
+      const documents = [];
+      processes = [];
+      userOwnedBooks = [];
+      let userFirestore = db.collection("Users").doc(user.uid)
+      userFirestore.get().then((books)=>{
+        var data = books.get("ebooks");
+        for(let [key,value] of Object.entries(data)){
+          userOwnedBooks.push(key.trim())
+        }
+        userFirestore = db.collection("Books")
+        var counter = 0;
+        userFirestore.get().then((querySnapshot)=>{
+          querySnapshot.forEach((userDoc) => {
+            if(!userOwnedBooks.includes(userDoc.data().id)){
+              var storageRef = storage.ref(userDoc.data().id+"cover."+userDoc.data().cover);
+              processes.push(storageRef.getDownloadURL().then((download)=>{
+                documents.push([])
+                documents[counter][0] = userDoc.data().description
+                documents[counter][1] = download
+                documents[counter][2] = userDoc.data().title
+                documents[counter++][3] = userDoc.data().price
+              }))
+              console.log(userDoc.data())
+            }
+          })
+          Promise.all(processes).then(function(){
+            console.log("Documents: " + documents)
+            res.render("userAvailableBooks",{id:user.uid, books:documents})
+          });
+      })
+      })
       // ...
     })
     .catch((error) => {
@@ -106,6 +142,54 @@ app.post("/login",function(req,res){
       res.render("login", {error:true})
       console.log("Giremeeeeediiiiiiiiim");
     });
+
+});
+
+app.post("/create", function(req,res){
+  auth.createUserWithEmailAndPassword(req.body.email, req.body.password)
+    .then((userCredential) => {
+      // Signed in 
+      var user = userCredential.user;
+      credentials = userCredential.user;
+      console.log(user.uid);
+      var userData = {
+        age: req.body.age.toString(),
+        country: req.body.country.toString(),
+        ebooks: {},
+        email: req.body.email.toString(),
+        gender: req.body.gender.toString(),
+        userId: user.uid
+    }
+    const documents = [];
+    processes = [];
+    processes.push(db.collection("Users").doc(userData.userId).set(userData))
+    let userFirestore = db.collection("Books")
+    var counter = 0;
+    userFirestore.get().then((querySnapshot)=>{
+      querySnapshot.forEach((userDoc) => {
+        documents.push([])
+        var storageRef = storage.ref(userDoc.data().id+"cover."+userDoc.data().cover);
+        processes.push(storageRef.getDownloadURL().then((download)=>{
+          documents[counter][0] = userDoc.data().description
+          documents[counter][1] = download
+          documents[counter][2] = userDoc.data().title
+          documents[counter++][3] = userDoc.data().price
+        }))
+        console.log(userDoc.data())
+      })
+      Promise.all(processes).then(function(){
+        console.log("Documents: " + documents)
+        res.render("userAvailableBooks",{id:user.uid, books:documents})
+      });
+  })
+    })
+    .catch((error) => {
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      // ..
+    });
+
+  
 
 });
 
@@ -351,44 +435,6 @@ app.post("/adminEditAccount",function(req,res){
 });
 
 
-app.post("/create", function(req,res){
-  console.log(req.body.email);
-  console.log(req.body.password);
-  console.log(req.body.country);
-  console.log(req.body.gender);
-  auth.createUserWithEmailAndPassword(req.body.email, req.body.password)
-    .then((userCredential) => {
-      // Signed in 
-      var user = userCredential.user;
-      credentials = userCredential.user;
-      console.log(user.uid);
-      var userData = {
-        age: req.body.age.toString(),
-        country: req.body.country.toString(),
-        ebooks: {},
-        email: req.body.email.toString(),
-        gender: req.body.gender.toString(),
-        userId: user.uid
-    }
-    db.collection("Users").doc(userData.userId).set(userData).then(()=>{
-      res.render("userAvailableBooks", {id:userData.userID})
-    }).catch(() =>{
-      console.log("olmadı")
-    });
-      //firebase.firestore().collection("Users").doc(user.uid).set(userData);
-        
-      
-      // ...
-    })
-    .catch((error) => {
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      // ..
-    });
-
-  
-
-})
 
 
 app.listen(4000,function(){

@@ -124,7 +124,7 @@ measurementId: "G-MKN3EDRVNM"
     location.reload()
   }
   else{
-    const bookRef = firebase.firestore().collection("Books").doc(bookID)
+    let bookRef = firebase.firestore().collection("Books").doc(bookID)
     bookRef.get().then((docSnapshot)=>{
       if(!docSnapshot.exists){
         alert("There is no book in the database with the given ID. Please enter a valid ID.")
@@ -133,46 +133,77 @@ measurementId: "G-MKN3EDRVNM"
       else{
 
         var data = {
-          title: (title == "") ? docSnapshot.get("title") : title,
-          language: (language == "") ? docSnapshot.get("language"): language,
-          price: (price == "") ? docSnapshot.get("price"): price,
-          description: (description == "") ? docSnapshot.get("description"):description
+          title: (title=="") ? docSnapshot.get("title") : title,
+          language : (language == "") ? docSnapshot.get("language") : language,
+          price: (price=="") ? docSnapshot.get("price") : price
         }
         console.log("Title "+data.title)
         console.log("Language "+data.language)
         console.log("Price "+data.price)
         console.log("Description "+data.description)
-        bookRef.update(data)
-        if(cover === undefined){
+        bookRef.update(data).then(()=>{
+          if(cover === undefined){
           alert("The book has been updated.")
           location.reload()
         }
         else{
           var coverName = cover.name;
-          if(!(coverName.split('.').pop() == 'png' || coverName.split('.').pop() == 'jpg' || coverName.split('.').pop() == 'jpeg')){
+          if(!(coverName.split('.').pop().toString().toLowerCase() == 'png' || coverName.split('.').pop().toString().toLowerCase() == 'jpg' || coverName.split('.').pop().toString().toLowerCase() == 'jpeg')){
             alert("Cover image is not acceptable.")
             location.reload()
           }
           else{
             var fileNameSplit = coverName.split('.');
-            var coverExtension = fileNameSplit.pop();
+            var coverExtension = fileNameSplit.pop().toString().toLowerCase();
             var coverName = fileNameSplit.join('');
           }
           console.log(bookID+"cover."+coverExtension)
-          var storageRef = firebase.storage().ref(bookID+"cover."+coverExtension);
+          var exCover = docSnapshot.get("cover");
+          if(exCover != coverExtension){
+            console.log(exCover)
+            var deleteRef = firebase.storage().ref(bookID+"cover."+exCover)
+            deleteRef.delete().then(()=>{
+              var storageRef = firebase.storage().ref(bookID+"cover."+coverExtension);
           var task = storageRef.put(cover);
             task.on('state_changed', function progress(snapshot) {
 
             }, function error(err) {
 
             },function complete() {
-              bookRef.update({cover:coverExtension})
-              alert("The book has been updated.")
-              document.getElementById('uploading').style.visibility = 'hidden'
-              location.reload()
+              bookRef.update({cover:coverExtension}).then(()=>{
+                alert("The book has been updated.")
+                document.getElementById('uploading').style.visibility = 'hidden'
+                location.reload()
+              })
+              
               
             });
+            })
+          }
+          else{
+            var storageRef = firebase.storage().ref(bookID+"cover."+coverExtension);
+            var task = storageRef.put(cover);
+            task.on('state_changed', function progress(snapshot) {
+
+            }, function error(err) {
+
+            },function complete() {
+              bookRef.update({cover:coverExtension}).then(()=>{
+                alert("The book has been updated.")
+                document.getElementById('uploading').style.visibility = 'hidden'
+                location.reload()
+              })
+              
+              
+            });
+          }
+            
+
         }
+        }).catch(()=>{
+          console.log("Hata var")
+        })
+
       }
     })
   }

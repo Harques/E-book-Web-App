@@ -120,6 +120,7 @@ firebase.initializeApp(firebaseConfig);
 <script>
   var userID = "<%= id %>";
         $.get("/library?uid="+ userID,function(data,status){
+          console.log(data)
           for(i = 0; i<data.length;i++){
             $(document).ready(function(){
               var url = '/getBook?book=' + data[i][0] + '&uid='+ userID
@@ -240,7 +241,7 @@ pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
 $(function(){
   $('#save').click(function(){
   let userFirestore = firebase.firestore().collection("Users").doc(userID)
-  userFirestore.update({['ebooks.'+book]:pageNum})
+  userFirestore.update({['ebooks.'+book]:pageNum-1})
 });
 });
 

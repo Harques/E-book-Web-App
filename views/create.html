@@ -62,7 +62,9 @@
 							<label for="age" style="color:white;">Age</label>
 							<input class="input100" type="number" name="age" id="age" min="18" max="100">
 						</div>
-	
+						<div id="error" style="display: none;margin-bottom:1rem;">
+							<p style="color:white">Your account was not created. Please try again.</p>
+						</div>
 						<div data-dropup-auto="false" size="true" data-size="5">
 							<label style="color:white;" for="country">Country</label>
 							<select required name="country" class="form-control" id="country" data-dropup-auto="false" size="true" data-size="5">
@@ -335,7 +337,7 @@
 							<select required name="gender" class="form-control" id="gender" data-dropup-auto="false" size="true" data-size="5">
 								<option value="Male" label="Male">Male</option>
 								<option value="Female" label="Female">Female</option>
-								<option value="Other" label="Other">Other</option>
+								<option value="Others" label="Others">Others</option>
 							</select>
 						</div>
 						<div class="container-login100-form-btn" style="margin-top:1rem">
@@ -372,6 +374,13 @@
 <!--===============================================================================================-->
 	<script src="/stylesheets/create/js/main.js"></script>
 
-
+	<script>
+		var authenticationFail = "<%= error %>" === 'true';
+		console.log(authenticationFail)
+		if(authenticationFail){
+			document.getElementById('error').style.display="block";
+		}
+			
+	</script>
 </body>
 </html>

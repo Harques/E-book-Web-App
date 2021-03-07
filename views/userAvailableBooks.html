@@ -63,16 +63,18 @@
                       <span class="sr-only">Next</span>
                   </a>
               </div>
+              <h2 id="transaction" style="margin-left:10%; margin-top:3rem; color:black; visibility: hidden;"></h2>
           </div>
-          
+          <h1 hidden id ="priceBook"></h1>
     </div>
+
     </div>
     <!-- /#page-content-wrapper -->
 
 </div>
 <!-- /#wrapper -->
 
-      
+<h3 id="correcter" hidden></h3>     
 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
 
@@ -112,6 +114,7 @@
         $.get("/library?uid="+ userID,function(data,status){
           for(i = 0; i<data.length;i++){
             $(document).ready(function(){
+              console.log(data[i][0])
               var url = '/getBook?book=' + data[i][0] + '&uid='+ userID
               $("#library").append('<li><a class=\'books\' href='+ url +'>'+data[i][1]+"</a></li>")
             })
@@ -140,10 +143,12 @@
         var bookCounter = 0;
         var myCarousel = $("#bookCarousel")
             for(i = 0; i< booksArray.length;i+=4){
+              if(books=="")
+              break;
                 if(i==0)
-                    myCarousel.append("<div class=\"carousel-item active\"><div class=\"col-md-4\"><div style=\"height:400px;\" class=\"card card-body\"><img loading=\"eager\" class=\"img-fluid\" src=\""+ booksArray[i+1]+"\"><br><h3>Title: "+booksArray[i+2] +"</h3><br><p>Description: "+booksArray[i]+"</p><div style=\"margin-top:1rem;\" id=\"smart-button-container\"><div style=\"text-align: center;\"><div id=\"paypal-button-container"+i/4+"\"></div></div></div></div></div></div></div>")
+                    myCarousel.append("<div class=\"carousel-item active\"><div class=\"col-md-4\"><div style=\"height:400px;\" class=\"card card-body\"><img loading=\"eager\" class=\"img-fluid\" src=\""+ booksArray[i+1]+"\"><br><h3>Title: "+booksArray[i+2] +"</h3><br><p>Description: "+booksArray[i]+"</p><div class=\"paypal-class\" id=\"paypal-button\"></div></div></div></div></div>")
                 else
-                    myCarousel.append("<div class=\"carousel-item\"><div class=\"col-md-4\"><div style=\"height:400px;\" class=\"card card-body\"><img loading=\"eager\" class=\"img-fluid\" src=\""+ booksArray[i+1]+"\"><br><h3>Title: "+booksArray[i+2] +"</h3><br><p>Description: "+booksArray[i]+"</p><div style=\"margin-top:1rem;\" id=\"smart-button-container\"><div style=\"text-align: center;\"><div id=\"paypal-button-container"+i/4+"\"></div></div></div></div></div></div></div>")
+                    myCarousel.append("<div class=\"carousel-item\"><div class=\"col-md-4\"><div style=\"height:400px;\" class=\"card card-body\"><img loading=\"eager\" class=\"img-fluid\" src=\""+ booksArray[i+1]+"\"><br><h3>Title: "+booksArray[i+2] +"</h3><br><p>Description: "+booksArray[i]+"</p><div class=\"paypal-class\" id=\"paypal-button\"></div></div></div></div></div>")
                 bookCounter++;
                     }
 
@@ -166,7 +171,7 @@ $(document).ready(function(){
         var myCarousel = $('#bookCarousel')
         myCarousel.css('display','none');
         var mainDiv = $('#mainDiv')
-        mainDiv.append("<h1>There are no books to be shown</h1>")
+        mainDiv.append("<h1 style=\"color:black\">There are no books to be shown</h1>")
         var nextButton = $('#nextButton')
         var prevButton = $('#prevButton')
         nextButton.css('display','none')
@@ -175,10 +180,11 @@ $(document).ready(function(){
 
     else if(counter == 1){
         var myCarousel = $("#bookCarousel")
-        myCarousel.append("<div class=\"carousel-item\"><div class=\"col-md-4\"><div style=\"height:400px;\" class=\"card card-body\"><img loading=\"eager\" class=\"img-fluid\" src=\""+ booksArray[1]+"\"><br><h3>Title: "+booksArray[2] +"</h3><br><p>Description: "+booksArray[0]+"</p><div style=\"margin-top:1rem;\" id=\"smart-button-container\"><div style=\"text-align: center;\"><div id=\"paypal-button-container"+i/4+"\"></div></div></div></div></div></div>")
+        myCarousel.append("<div class=\"carousel-item\"><div class=\"col-md-4\"><div style=\"height:400px;\" class=\"card card-body\"><img loading=\"eager\" class=\"img-fluid\" src=\""+ booksArray[1]+"\"><br><h3>Title: "+booksArray[2] +"</h3><br><p>Description: "+booksArray[0]+"</p><div class=\"paypal-class\" id=\"paypal-button\"></div></div></div></div>")
         $('.carousel .carousel-item').each(function(){
             for (i = 0; i<2; i++){
-                $(this).children(':first-child').clone().appendTo($(this));
+                $(this).children(':first-child').clone().appendTo($(this))
+                
             }
       });
     }
@@ -202,11 +208,8 @@ $(document).ready(function(){
     else if (counter > 2){
         $('.carousel .carousel-item').each(function(){
           var minPerSlide = 3;
-          console.log("Bu" + this)
           var next = $(this).next();
-          console.log("bir sonraki" + next)
           if (!next.length) {
-              console.log("Length")
           next = $(this).siblings(':first');
           }
           next.children(':first-child').clone().appendTo($(this));
@@ -214,7 +217,6 @@ $(document).ready(function(){
           for (var i=0;i<minPerSlide;i++) {
               next=next.next();
               if (!next.length) {
-                  console.log("Buraya da girdi")
                 next = $(this).siblings(':first');
               }
               
@@ -225,42 +227,110 @@ $(document).ready(function(){
 
 });
 </script>
-<script src="https://www.paypal.com/sdk/js?client-id=sb&currency=USD" data-sdk-integration-source="button-factory"></script>
-  <script>
-        var books = "<%= books %>";
-        var booksArray = books.split(',');
-    function initPayPalButton() {
-      for(i=0;i<booksArray.length/4;i++){
-        var price = parseInt(booksArray[(i+1)*4])
-        paypal.Buttons({
-        style: {
-          shape: 'rect',
-          color: 'gold',
-          layout: 'vertical',
-          label: 'paypal',
-          
-        },
+<script src="https://www.paypalobjects.com/api/checkout.js"></script>
 
-        createOrder: function(data, actions) {
-          return actions.order.create({
-            purchase_units: [{"amount":{"currency_code":"USD","value":price}}]
-          });
-        },
 
-        onApprove: function(data, actions) {
-          return actions.order.capture().then(function(details) {
-            alert('Transaction completed by ' + details.payer.name.given_name + '!');
-          });
-        },
+<script>
+    var books = "<%= books %>";
+    var booksArray = books.split(',');
+    var titles =  [];
+    var prices = [];
+    var paypalPrices = [];
+    var paypalTitles = [];
+    for(i=2;i<booksArray.length;i+=4){
+      document.getElementById('correcter').innerHTML = booksArray[i]
+      titles.push(document.getElementById('correcter').innerHTML)
 
-        onError: function(err) {
-          console.log(err);
-        }
-      }).render('#paypal-button-container'+i);
     }
-      }
-
-    initPayPalButton();
-  </script>
+      document.getElementById('correcter').remove()
+    for(i=3;i<booksArray.length;i+=4)
+      prices.push(booksArray[i])
+    var userID = "<%= id %>";
+    var counter = 0;
+    $(function(){
+      var price;
+      $('h3').each(function(){
+        $(this).attr('class','title'+counter)
+        counter++;
+      })
+      counter=0;
+      $('.paypal-class').each(function(){
+        console.log("Loop" + counter)
+        $(this).attr('id','paypal-button'+counter)
+        $(this).css('margin-top',"1rem")
+        $(this).mouseover(function(){
+          document.getElementById('priceBook').innerHTML = $(this).attr('id')
+        })
+        var title = $('.title'+counter).html()
+        title = title.substring(7)
+        for(i=0; i<titles.length;i++){
+          if(titles[i].trim().localeCompare(title.trim()) == 0){
+            paypalPrices.push(prices[i])
+            paypalTitles.push(titles[i])
+          }
+        }
+      counter++;
+        
+    })
+    console.log("Counter is " + counter)
+    for(i=0;i<counter;i++){
+      paypal.Button.render({
+        
+        env: 'sandbox', // Or 'production'
+        // Set up the payment:
+        // 1. Add a payment callback
+        payment: function(data, actions) {
+          // 2. Make a request to your server
+          var button = document.getElementById('priceBook').innerHTML
+          var index = parseInt(button.substring(13))
+          return actions.request.post('/my-api/create-payment/',{
+            price: paypalPrices[index]
+          })
+            .then(function(res) {
+              // 3. Return res.id from the response
+              return res.id;
+            });
+        },
+        // Execute the payment:
+        // 1. Add an onAuthorize callback
+        onAuthorize: function(data, actions) {
+          var button = document.getElementById('priceBook').innerHTML
+          var index = parseInt(button.substring(13))
+          // 2. Make a request to your server
+          return actions.request.post('/my-api/execute-payment/', {
+            paymentID: data.paymentID,
+            payerID: data.payerID,
+            price: paypalPrices[index]
+    
+          })
+            .then(function(res) {
+              $.get("/addBook?uid="+ userID+"&title="+paypalTitles[index],function(data,status){
+                console.log("Data " + data)
+                if(data.trim().localeCompare('OK') == 0){
+                  document.getElementById('transaction').innerHTML = "Your transaction was succesful."
+                  document.getElementById('transaction').style.visibility = 'visible'
+                  setTimeout(function(){
+                    location.reload()
+                  },1000)
+                }
+                  else if (data.trim().localeCompare('Error') == 0){
+                    document.getElementById('transaction').innerHTML = "There was a problem with your transaction. Please try again later."
+                    document.getElementById('transaction').style.visibility = 'visible'
+                    setTimeout(function(){
+                      location.reload()
+                    },1000)
+                  }
+              
+            });
+              // 3. Show the buyer a confirmation message.
+            });
+        }
+      }, '#paypal-button'+i);
+    }
+    })
+      
+      
+  
+</script>
 </body>
 </html>

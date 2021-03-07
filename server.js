@@ -1,5 +1,6 @@
 var express = require('express');
 app = express();
+var request = require('request');
 var bodyParser = require('body-parser')
 const path = require("path");
 var firebase = require('firebase/app');
@@ -7,7 +8,7 @@ require("firebase/auth");
 require("firebase/firestore");
 require("firebase/storage")
 var admin = require("./admin");
-const querystring = require('querystring')
+const querystring = require('querystring');
 global.XMLHttpRequest = require("xhr2")
 
 
@@ -52,7 +53,38 @@ app.get("/admin",function(req,res){
 
 app.get("/userAvailableBooks",function(req,res){
   id = req.query.uid
-  res.render("userAvailableBooks", {id: id})
+  const documents = [];
+  processes = [];
+  userOwnedBooks = [];
+  let userFirestore = db.collection("Users").doc(id)
+  userFirestore.get().then((books)=>{
+    var data = books.get("ebooks");
+    for(let [key,value] of Object.entries(data)){
+      userOwnedBooks.push(key.trim())
+    }
+    userFirestore = db.collection("Books")
+    var counter = 0;
+    userFirestore.get().then((querySnapshot)=>{
+      querySnapshot.forEach((userDoc) => {
+        if(!userOwnedBooks.includes(userDoc.data().id)){
+          var storageRef = storage.ref(userDoc.data().id+"cover."+userDoc.data().cover);
+          processes.push(storageRef.getDownloadURL().then((download)=>{
+            documents.push([])
+            documents[counter][0] = userDoc.data().description
+            documents[counter][1] = download
+            documents[counter][2] = userDoc.data().title
+            documents[counter++][3] = userDoc.data().price
+          }))
+          console.log(userDoc.data())
+        }
+      })
+      Promise.all(processes).then(function(){
+        console.log("Documents: " + documents)
+        res.render("userAvailableBooks",{id:id, books:documents})
+      });
+  })
+  })
+  
 });
 
 app.get("/intoLogin",function(req,res){
@@ -94,15 +126,11 @@ app.get("/forgotPassword",function(req,res){
 });
 
 app.post("/login",function(req,res){
-    console.log(req.body.email);
-    console.log(req.body.pass);
     firebase.auth().signInWithEmailAndPassword(req.body.email, req.body.pass)
     .then((userCredential) => {
       // Signed in
       var user = userCredential.user;
-      console.log("Girdim ya sakin");
       userID = user.uid;
-      console.log(userID);
       const documents = [];
       processes = [];
       userOwnedBooks = [];
@@ -140,7 +168,6 @@ app.post("/login",function(req,res){
       var errorCode = error.code;
       var errorMessage = error.message;
       res.render("login", {error:true})
-      console.log("Giremeeeeediiiiiiiiim");
     });
 
 });
@@ -186,6 +213,7 @@ app.post("/create", function(req,res){
     .catch((error) => {
       var errorCode = error.code;
       var errorMessage = error.message;
+      res.render("create",{error:true})
       // ..
     });
 
@@ -208,7 +236,7 @@ app.post("/sendEmail",function(req,res){
 });
 
 app.get("/intoCreate",function(req,res){
-  res.render("create")
+  res.render("create",{error:false})
 });
 app.get("/library",function(req,res){
   let id = req.query.uid
@@ -223,8 +251,9 @@ app.get("/library",function(req,res){
             let userBooks = db.collection("Books").doc(key);
             processes.push(userBooks.get().then((title)=>{
             var booktitle = title.get("title")
+            var bookID = title.get("id")
             ownedBooks.push([])
-            ownedBooks[counter][0] = key
+            ownedBooks[counter][0] = bookID
             ownedBooks[counter++][1] = booktitle
             }))
           }
@@ -257,7 +286,6 @@ app.get("/getBook",function(req,res){
   console.log(book)
   let storageRef = storage.ref(book + ".pdf")
   storageRef.getDownloadURL().then((url)=>{
-    console.log(url)
     let userFirestore = db.collection("Users").doc(id)
     userFirestore.get().then((books)=>{
       var data = books.get("ebooks");
@@ -265,7 +293,7 @@ app.get("/getBook",function(req,res){
         bookString = book.toString()
         if(bookString.trim().localeCompare(key.trim()) == 0){
           console.log(key+':'+value);
-          res.render("userPDFReader",{pageNumber: value, pdfURL: url, id: id, book: book})
+          res.render("userPDFReader",{pageNumber: value+1, pdfURL: url, id: id, book: book})
           
         }
       }
@@ -420,10 +448,11 @@ app.post("/adminEditAccount",function(req,res){
   const getDoc = userFirestore.get().then((doc)=>{
     console.log(doc.exists)
     if(!doc.exists){
-      console.log("girdi")
       res.status(409).send("User does not exist") 
     }
     else{
+      if(req.body.password == "")
+      res.status(410).send("Password is empty")
     var adminData ={
       password: req.body.password
     };
@@ -434,8 +463,135 @@ app.post("/adminEditAccount",function(req,res){
   
 });
 
+// Add your credentials:
+// Add your client ID and secret
+var CLIENT =
+  'AUJoKVGO3q1WA1tGgAKRdY6qx0qQNIQ6vl6D3k7y64T4qh5WozIQ7V3dl3iusw5BwXYg_T5FzLCRguP8';
+var SECRET =
+  'EOw8LNwDhM7esrQ3nHfzKc7xiWnJc83Eawln4YLfUgivfx1LGzu9Mj0F5wlarilXDqdK9Q5aHVo-VGjJ';
+var PAYPAL_API = 'https://api-m.sandbox.paypal.com';
+  // Set up the payment:
+  // 1. Set up a URL to handle requests from the PayPal button
+  app.post('/my-api/create-payment/', function(req, res)
+  {
+    var price = parseFloat(req.body.price);
+    // 2. Call /v1/payments/payment to set up the payment
+    request.post(PAYPAL_API + '/v1/payments/payment',
+    {
+      auth:
+      {
+        user: CLIENT,
+        pass: SECRET
+      },
+      body:
+      {
+        intent: 'sale',
+        payer:
+        {
+          payment_method: 'paypal'
+        },
+        transactions: [
+        {
+          amount:
+          {
+            total: price,
+            currency: 'USD'
+          }
+        }],
+        redirect_urls:
+        {
+          return_url: 'https://example.com',
+          cancel_url: 'https://example.com'
+        }
+      },
+      json: true
+    }, function(err, response)
+    {
+      if (err)
+      {
+        console.error(err);
+        return res.sendStatus(500);
+      }
+      // 3. Return the payment ID to the client
+      res.json(
+      {
+        id: response.body.id
+      });
+    });
+  })
+  // Execute the payment:
+  // 1. Set up a URL to handle requests from the PayPal button.
+  app.post('/my-api/execute-payment/', function(req, res)
+  {
+    // 2. Get the payment ID and the payer ID from the request body.
+    var paymentID = req.body.paymentID;
+    var payerID = req.body.payerID;
+    var price = parseFloat(req.body.price);
+    // 3. Call /v1/payments/payment/PAY-XXX/execute to finalize the payment.
+    request.post(PAYPAL_API + '/v1/payments/payment/' + paymentID +
+      '/execute',
+      {
+        auth:
+        {
+          user: CLIENT,
+          pass: SECRET
+        },
+        body:
+        {
+          payer_id: payerID,
+          transactions: [
+          {
+            amount:
+            {
+              total: price,
+              currency: 'USD'
+            }
+          }]
+        },
+        json: true
+      },
+      function(err, response)
+      {
+        if (err)
+        {
+          console.error(err);
+          return res.sendStatus(500);
+        }
+        // 4. Return a success response to the client
+        res.json(
+        {
+          status: 'success'
+        });
+      });
+  })
+// Run `node ./server.js` in your terminal
 
-
+app.get("/addBook",function(req,res){
+  let title = req.query.title
+  let id = req.query.uid
+  let bookFirestore = db.collection("Books");
+  bookFirestore.where("title", "==", title).get().then((querySnapshot)=>{
+    if(querySnapshot.empty){
+      console.log("Empty")
+      res.send('Error')
+    }
+    else{
+      querySnapshot.forEach((doc)=>{
+        console.log(doc.id)
+        let userFirestore = db.collection("Users").doc(id)
+        userFirestore.get().then((document)=>{
+          var data = document.get("ebooks");
+          data[doc.id] = 0
+          userFirestore.update({ebooks:data}).then(()=>{
+              userFirestore.get().then((newDoc) =>{
+                res.send('OK')
+              })
+          })
+        })
+      })
+    } 
+  })
+})
 
 app.listen(4000,function(){
     console.log("Server is running");

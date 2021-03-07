@@ -328,7 +328,7 @@
                   <select required name="gender" class="form-control" id="gender" data-dropup-auto="false" size="true" data-size="5">
                     <option value="Male" label="Male">Male</option>
                     <option value="Female" label="Female">Female</option>
-                    <option value="Others" label="Other">Other</option>
+                    <option value="Others" label="Others">Others</option>
                   </select>
                 </div>
                 <button id="editAccountSubmit" style="margin-left:45%; margin-top:2rem;" class="b" type="submit">Save</button>
@@ -447,6 +447,15 @@ $(document).ready(function(){
       for(i = 0; i<data.length;i++){
         $(document).ready(function(){
           $("#credentials").append("<li><a href=\"#\">"+data[i].join("")+"</a></li>")
+          if(data[i][0].trim().localeCompare("Country:") == 0){
+            document.getElementById('country').value = data[i][1]
+          }
+          else if(data[i][0].trim().localeCompare("Age:") == 0){
+            document.getElementById('age').value = data[i][1]
+          }
+          else{
+            document.getElementById('gender').value = data[i][1]
+          }
         })
       }
       $('#credentials').append("<li><a href=\"userEditAccount?uid="+ userID+"\">Edit Account Credentials</a></li>")
@@ -468,22 +477,21 @@ $(document).ready(function(){
     let userRef = firebase.firestore().collection("Users").doc(userID)
     userRef.get().then((docSnapshot)=>{
       if(!docSnapshot.exists){
-        alert("There is no")
+        alert("There is no user")
       }
       else{
-        console.log("Age:"+age)
-        console.log("Country:"+country)
-        console.log("Gender:"+gender)
         var data = {
           country: country,
           age: (age=="") ? docSnapshot.get("age"):age,
           gender: gender
         }
-        console.log("Yas:" + data.age)
         userRef.update(data).then(()=>{
           document.getElementById('uploading').style.visibility = 'hidden'
           document.getElementById('uploaded').innerHTML = "Your account's credentials have been updated."
           document.getElementById('uploaded').style.visibility = 'visible'
+          setTimeout(function(){
+            location.reload()
+          },1000)
         }).catch(()=>{
           console.log("Hata var")
         })

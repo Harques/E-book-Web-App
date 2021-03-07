@@ -31,6 +31,48 @@
             <div id="recipeCarousel" class="carousel slide w-100" data-ride="carousel">
               <ul class="carousel-indicators"></ul>
                 <div id="bookCarousel" class="carousel-inner w-100" role="listbox">
+                  <div class="carousel-item active">
+                    <div class="col-md-4">
+                        <div class="card card-body">
+                            <img class="img-fluid" src="http://placehold.it/380?text=1">
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="col-md-4">
+                        <div class="card card-body">
+                            <img class="img-fluid" src="http://placehold.it/380?text=2">
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="col-md-4">
+                        <div class="card card-body">
+                            <img class="img-fluid" src="http://placehold.it/380?text=3">
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="col-md-4">
+                        <div class="card card-body">
+                            <img class="img-fluid" src="http://placehold.it/380?text=4">
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="col-md-4">
+                        <div class="card card-body">
+                            <img class="img-fluid" src="http://placehold.it/380?text=5">
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="col-md-4">
+                        <div class="card card-body">
+                            <img class="img-fluid" src="http://placehold.it/380?text=6">
+                        </div>
+                    </div>
+                </div>
                 </div>
                 <a id="prevButton" class="carousel-control-prev w-auto" href="#recipeCarousel" role="button" data-slide="prev">
                     <span class="carousel-control-prev-icon bg-dark border border-dark rounded-circle" aria-hidden="true"></span>
@@ -59,7 +101,9 @@
         $(document).ready(function(){
             var myCarousel = $("#bookCarousel")
                 for(i = 0; i< booksArray.length;i+=3){
-                    if(i==0)
+                  if(books=="")
+                    break;
+                    /*if(i==0)
                         myCarousel.append("<div class=\"carousel-item active\"><div class=\"col-md-4\"><div style=\"height:400px;\" class=\"card card-body\"><img loading=\"eager\" class=\"img-fluid\" src=\""+ booksArray[i+1]+"\"><br><h3>Title: "+booksArray[i+2] +"</h3><br><p>Description: "+booksArray[i]+"</div></div></div>")
                     /*else
                         myCarousel.append("<div class=\"carousel-item\"><div class=\"col-md-4\"><div style=\"height:400px;\" class=\"card card-body\"><img loading=\"eager\" class=\"img-fluid\" src=\""+ booksArray[i+1]+"\"><br><h3>Title: "+booksArray[i+2] +"</h3><br><p>Description: "+booksArray[i]+"</div></div></div>")
@@ -122,11 +166,8 @@ $(document).ready(function(){
     else if (counter > 2){
         $('.carousel .carousel-item').each(function(){
           var minPerSlide = 3;
-          console.log("Bu" + this)
           var next = $(this).next();
-          console.log("bir sonraki" + next)
           if (!next.length) {
-              console.log("Length")
           next = $(this).siblings(':first');
           }
           next.children(':first-child').clone().appendTo($(this));
@@ -134,7 +175,6 @@ $(document).ready(function(){
           for (var i=0;i<minPerSlide;i++) {
               next=next.next();
               if (!next.length) {
-                  console.log("Buraya da girdi")
                 next = $(this).siblings(':first');
               }
               

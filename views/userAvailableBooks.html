@@ -255,7 +255,6 @@ $(document).ready(function(){
       })
       counter=0;
       $('.paypal-class').each(function(){
-        console.log("Loop" + counter)
         $(this).attr('id','paypal-button'+counter)
         $(this).css('margin-top',"1rem")
         $(this).mouseover(function(){
@@ -305,7 +304,6 @@ $(document).ready(function(){
           })
             .then(function(res) {
               $.get("/addBook?uid="+ userID+"&title="+paypalTitles[index],function(data,status){
-                console.log("Data " + data)
                 if(data.trim().localeCompare('OK') == 0){
                   document.getElementById('transaction').innerHTML = "Your transaction was succesful."
                   document.getElementById('transaction').style.visibility = 'visible'

@@ -120,7 +120,6 @@ firebase.initializeApp(firebaseConfig);
 <script>
   var userID = "<%= id %>";
         $.get("/library?uid="+ userID,function(data,status){
-          console.log(data)
           for(i = 0; i<data.length;i++){
             $(document).ready(function(){
               var url = '/getBook?book=' + data[i][0] + '&uid='+ userID

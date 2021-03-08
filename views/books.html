@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
     <link rel="stylesheet" href="/stylesheets/books/css/styles.css">
-    <title>Document</title>
+    <title>Wuhan</title>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-transparent">
@@ -31,48 +31,7 @@
             <div id="recipeCarousel" class="carousel slide w-100" data-ride="carousel">
               <ul class="carousel-indicators"></ul>
                 <div id="bookCarousel" class="carousel-inner w-100" role="listbox">
-                  <div class="carousel-item active">
-                    <div class="col-md-4">
-                        <div class="card card-body">
-                            <img class="img-fluid" src="http://placehold.it/380?text=1">
-                        </div>
-                    </div>
-                </div>
-                <div class="carousel-item">
-                    <div class="col-md-4">
-                        <div class="card card-body">
-                            <img class="img-fluid" src="http://placehold.it/380?text=2">
-                        </div>
-                    </div>
-                </div>
-                <div class="carousel-item">
-                    <div class="col-md-4">
-                        <div class="card card-body">
-                            <img class="img-fluid" src="http://placehold.it/380?text=3">
-                        </div>
-                    </div>
-                </div>
-                <div class="carousel-item">
-                    <div class="col-md-4">
-                        <div class="card card-body">
-                            <img class="img-fluid" src="http://placehold.it/380?text=4">
-                        </div>
-                    </div>
-                </div>
-                <div class="carousel-item">
-                    <div class="col-md-4">
-                        <div class="card card-body">
-                            <img class="img-fluid" src="http://placehold.it/380?text=5">
-                        </div>
-                    </div>
-                </div>
-                <div class="carousel-item">
-                    <div class="col-md-4">
-                        <div class="card card-body">
-                            <img class="img-fluid" src="http://placehold.it/380?text=6">
-                        </div>
-                    </div>
-                </div>
+
                 </div>
                 <a id="prevButton" class="carousel-control-prev w-auto" href="#recipeCarousel" role="button" data-slide="prev">
                     <span class="carousel-control-prev-icon bg-dark border border-dark rounded-circle" aria-hidden="true"></span>
@@ -103,11 +62,11 @@
                 for(i = 0; i< booksArray.length;i+=3){
                   if(books=="")
                     break;
-                    /*if(i==0)
+                    if(i==0)
                         myCarousel.append("<div class=\"carousel-item active\"><div class=\"col-md-4\"><div style=\"height:400px;\" class=\"card card-body\"><img loading=\"eager\" class=\"img-fluid\" src=\""+ booksArray[i+1]+"\"><br><h3>Title: "+booksArray[i+2] +"</h3><br><p>Description: "+booksArray[i]+"</div></div></div>")
-                    /*else
+                    else
                         myCarousel.append("<div class=\"carousel-item\"><div class=\"col-md-4\"><div style=\"height:400px;\" class=\"card card-body\"><img loading=\"eager\" class=\"img-fluid\" src=\""+ booksArray[i+1]+"\"><br><h3>Title: "+booksArray[i+2] +"</h3><br><p>Description: "+booksArray[i]+"</div></div></div>")
-                        */}
+                        }
 
 
         });

@@ -30,10 +30,10 @@
 </head>
 <body>
 	
-	<div class="limiter">
+	<div id="mainDiv" class="limiter">
 		<div class="container-login100" style="background-image: url('/stylesheets/login/images/bg-01.jpg');">
 			<div class="wrap-login100">
-				<form class="login100-form validate-form" action="/create" method="post">
+				<form id="createForm" class="login100-form validate-form" action="/create" method="post">
 					<span class="login100-form-logo">
 						<i class="zmdi zmdi-landscape"></i>
 					</span>
@@ -340,6 +340,16 @@
 								<option value="Others" label="Others">Others</option>
 							</select>
 						</div>
+						<div style="margin-top:1rem;" class="contact100-form-checkbox">
+							<input class="input-checkbox100" value="conditions" id="ckb1" type="checkbox" name="remember-me">
+							<label style="display:inline-block;" class="label-checkbox100" for="ckb1">
+								Accept
+							</label>
+							<a href="#" class="popup1_open" style="font-size:13px; color:blue;">Terms & Conditions</a>
+						</div>
+						<div id="notAccepted" style="display: none;margin-bottom:1rem;">
+							<p style="color:white">You have to accept terms & conditions to register.</p>
+						</div>
 						<div class="container-login100-form-btn" style="margin-top:1rem">
 							<button class="login100-form-btn" type="submit" id="submitButton">
 								Register
@@ -354,8 +364,21 @@
 		</div>
 	</div>
 	
-
-	<div id="dropDownSelect1"></div>
+	<section id="popup1">
+		<h2 style="text-align:center">Terms & Conditions</h2>
+		<p style="white-space:pre-line; text-align:center;">While using Our Service, We (“LATIN
+			AMERICA L.L.C”, “VEGOVSKI.COM”,
+			and/or “ALEXIS VEGA”, may ask You to
+			provide Us with certain personally identifiable
+			information that can be used to contact or
+			identify You. Personally identifiable
+			information may include, but is not limited to:
+			• Email Address
+			• Age
+			• Gender
+			• Country 
+</p>
+	  </section>
 	
 <!--===============================================================================================-->
 	<script src="/stylesheets/create/vendor/jquery/jquery-3.2.1.min.js"></script>
@@ -373,14 +396,35 @@
 	<script src="/stylesheets/create/vendor/countdowntime/countdowntime.js"></script>
 <!--===============================================================================================-->
 	<script src="/stylesheets/create/js/main.js"></script>
+	  <!-- Include jQuery Popup Overlay -->
+	  <script src="https://cdn.jsdelivr.net/gh/vast-engineering/jquery-popup-overlay@2/jquery.popupoverlay.min.js">
+	  </script>
 
 	<script>
 		var authenticationFail = "<%= error %>" === 'true';
-		console.log(authenticationFail)
 		if(authenticationFail){
 			document.getElementById('error').style.display="block";
 		}
 			
+	</script>
+	
+	<script>
+			$('#popup1').popup();
+	</script>
+	<script>
+		$(function() {
+    //hang on event of form with id=myform
+    $("#createForm").submit(function(e) {
+		var termsAndConditions = document.getElementById('ckb1').checked;
+
+		if(!termsAndConditions){
+		document.getElementById('notAccepted').style.display="block"
+		e.preventDefault();
+		}
+        //prevent Default functionality
+    });
+
+});
 	</script>
 </body>
 </html>

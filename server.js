@@ -48,7 +48,7 @@ app.get("/userPDFReader",function(req,res){
     res.render("userPDFReader",{id:id})
 });
 app.get("/admin",function(req,res){
-    res.render("admin")
+    res.render("admin",{error:false})
 });
 
 app.get("/userAvailableBooks",function(req,res){
@@ -354,12 +354,15 @@ app.post("/adminlogin",function(req,res){
       if(data == req.body.pass){
         res.render("adminUserList");
       }
+      else{
+        res.render("admin",{error:true})
+      }
     }).catch((err)=>{
-      console.log(err)
+      res.send(err)
     });
   }
   catch{
-    res.send(err);
+    res.send(err)
   }
 
 });

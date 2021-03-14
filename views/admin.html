@@ -52,9 +52,12 @@
 						<div class="wrap-input100 validate-input" data-validate="Enter password">
 							<input class="input100" type="password" name="pass" placeholder="Password">
 							<span class="focus-input100" data-placeholder="&#xf191;"></span>
+						</div>
+						<div id="error" style="display: none;margin-bottom:1rem;">
+							<p class="errorMessage" >The admin username or password is incorrect. Please try again.</p>
 						</div>	
 						<div class="container-login100-form-btn">
-							<button type="submit" class="login100-form-btn">
+							<button style="text-transform: uppercase;" type="submit" class="login100-form-btn">
 								Login
 							</button>
 						</div>
@@ -84,6 +87,14 @@
 	<script src="/stylesheets/admin/vendor/countdowntime/countdowntime.js"></script>
 <!--===============================================================================================-->
 	<script src="/stylesheets/admin/js/main.js"></script>
+	<script>
+		var authenticationFail = "<%= error %>" === 'true';
+		console.log(authenticationFail)
+		if(authenticationFail){
+			document.getElementById('error').style.display="block";
+		}
+			
+	</script>
 
 </body>
 </html>

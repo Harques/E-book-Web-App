@@ -31,11 +31,11 @@
 <body>
 	
 	<div id="mainDiv" class="limiter">
-		<div class="container-login100" style="background-image: url('/stylesheets/login/images/bg-01.jpg');">
+		<div class="container-login100" style="background-color: white;">
 			<div class="wrap-login100">
 				<form id="createForm" class="login100-form validate-form" action="/create" method="post">
 					<span class="login100-form-logo">
-						<i class="zmdi zmdi-landscape"></i>
+						<img src="/stylesheets/admin/fonts/iconic/css/80x80.jpg" alt="">
 					</span>
 					<span class="login100-form-title p-b-34 p-t-27">
 						Register
@@ -43,31 +43,32 @@
 					<form action="/create" method="post">
 						
 						<div class="wrap-input100 validate-input" data-validate = "Enter e-mail">
-							<label for="username" style="color:white;">E-Mail Address</label>
+							<label class="labelFont" for="username" style="color:black; font-size:25px;">E-Mail Address</label>
 							<input class="input100" type="text" name="email">
 							
 						</div>
 	
 						<div class="wrap-input100 validate-input" data-validate = "Enter password">
-							<label for="password" style="color:white;">Password</label>
+							<label class="labelFont" for="password" style="color:black; font-size:25px;">Password</label>
 							<input class="input100" type="password" name="password" id="password">
 						</div>
-
-						<div>
-							<input type="checkbox" onclick="show()" style="margin-bottom:1rem; color:white; " name="showPassword" id="showPassword">
-							<label for="checkbox" style="color:white; display:inline-block; margin-bottom:1rem">Show Password</label>
+						<div style="margin-top:1rem;" class="contact100-form-checkbox">
+							<input onclick="show();" class="input-checkbox100" value="conditions" id="showPassword" type="checkbox" name="accept">
+							<label style="display:inline-block; color:black;" class="label-checkbox100 labelFont" for="showPassword">
+								Show Password
+							</label>
 						</div>
 
 						<div class="wrap-input100 validate-input" data-validate = "Enter age">
-							<label for="age" style="color:white;">Age</label>
+							<label class="labelFont" for="age" style="color:black; font-size:25px;">Age</label>
 							<input class="input100" type="number" name="age" id="age" min="18" max="100">
 						</div>
 						<div id="error" style="display: none;margin-bottom:1rem;">
-							<p style="color:white">Your account was not created. Please try again.</p>
+							<p style="color:black">Your account was not created. Please try again.</p>
 						</div>
 						<div data-dropup-auto="false" size="true" data-size="5">
-							<label style="color:white;" for="country">Country</label>
-							<select required name="country" class="form-control" id="country" data-dropup-auto="false" size="true" data-size="5">
+							<label class="labelFont" style="color:black; font-size:25px;" for="country">Country</label>
+							<select required name="country" class="form-control labelFont" style="background-color:transparent; border:1px solid rgba(0,0,0,1);" id="country" data-dropup-auto="false" size="true" data-size="5">
 								<optgroup id="country-optgroup-Africa" label="Africa">
 									<option value="Algeria" label="Algeria">Algeria</option>
 									<option value="Angola" label="Angola">Angola</option>
@@ -333,25 +334,25 @@
 							</select>
 						</div>
 						<div>
-							<label style="color:white; margin-top: 1rem;" for="gender">Gender</label>
-							<select required name="gender" class="form-control" id="gender" data-dropup-auto="false" size="true" data-size="5">
+							<label class="labelFont" style="color:black; margin-top: 1rem; font-size:25px;" for="gender">Gender</label>
+							<select required name="gender" class="form-control labelFont" style="background-color:transparent; border:1px solid rgba(0,0,0,1);" id="gender" data-dropup-auto="false" size="true" data-size="5">
 								<option value="Male" label="Male">Male</option>
 								<option value="Female" label="Female">Female</option>
 								<option value="Others" label="Others">Others</option>
 							</select>
 						</div>
 						<div style="margin-top:1rem;" class="contact100-form-checkbox">
-							<input class="input-checkbox100" value="conditions" id="ckb1" type="checkbox" name="remember-me">
-							<label style="display:inline-block;" class="label-checkbox100" for="ckb1">
+							<input class="input-checkbox100" value="conditions" id="ckb1" type="checkbox" name="accept">
+							<label style="display:inline-block; color:black;" class="label-checkbox100 labelFont" for="ckb1">
 								Accept
 							</label>
-							<a href="#" class="popup1_open" style="font-size:13px; color:blue;">Terms & Conditions</a>
+							<a href="#" class="popup1_open labelFont" style="color:blue;">Terms & Conditions</a>
 						</div>
 						<div id="notAccepted" style="display: none;margin-bottom:1rem;">
-							<p style="color:white">You have to accept terms & conditions to register.</p>
+							<p class="labelFont" style="color:black">You have to accept terms & conditions to register.</p>
 						</div>
 						<div class="container-login100-form-btn" style="margin-top:1rem">
-							<button class="login100-form-btn" type="submit" id="submitButton">
+							<button style="text-transform: uppercase;" class="login100-form-btn" type="submit" id="submitButton">
 								Register
 							</button>
 						</div>
@@ -365,8 +366,8 @@
 	</div>
 	
 	<section id="popup1">
-		<h2 style="text-align:center">Terms & Conditions</h2>
-		<p style="white-space:pre-line; text-align:center;">While using Our Service, We (“LATIN
+		<h2 class="labelFont" style="text-align:center; font-size:60px;">Terms & Conditions</h2>
+		<p class="labelFont" style="white-space:pre-line; text-align:center; font-size:30px;">While using Our Service, We (“LATIN
 			AMERICA L.L.C”, “VEGOVSKI.COM”,
 			and/or “ALEXIS VEGA”, may ask You to
 			provide Us with certain personally identifiable

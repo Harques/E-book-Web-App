@@ -146,9 +146,9 @@
               if(books=="")
               break;
                 if(i==0)
-                    myCarousel.append("<div class=\"carousel-item active\"><div class=\"col-md-4\"><div style=\"height:400px;\" class=\"card card-body\"><img loading=\"eager\" class=\"img-fluid\" src=\""+ booksArray[i+1]+"\"><br><h3>Title: "+booksArray[i+2] +"</h3><br><p>Description: "+booksArray[i]+"</p><div class=\"paypal-class\" id=\"paypal-button\"></div></div></div></div></div>")
+                    myCarousel.append("<div class=\"carousel-item active\"><div class=\"col-md-4\"><div style=\"border:1px black solid; height:400px;\" class=\"card card-body\"><img loading=\"eager\" class=\"img-fluid\" src=\""+ booksArray[i+1]+"\"><br><h3>Title: "+booksArray[i+2] +"</h3><br><p>Description: "+booksArray[i]+"</p><div class=\"paypal-class\" id=\"paypal-button\"></div></div></div></div></div>")
                 else
-                    myCarousel.append("<div class=\"carousel-item\"><div class=\"col-md-4\"><div style=\"height:400px;\" class=\"card card-body\"><img loading=\"eager\" class=\"img-fluid\" src=\""+ booksArray[i+1]+"\"><br><h3>Title: "+booksArray[i+2] +"</h3><br><p>Description: "+booksArray[i]+"</p><div class=\"paypal-class\" id=\"paypal-button\"></div></div></div></div></div>")
+                    myCarousel.append("<div class=\"carousel-item\"><div class=\"col-md-4\"><div style=\"border:1px black solid; height:400px;\" class=\"card card-body\"><img loading=\"eager\" class=\"img-fluid\" src=\""+ booksArray[i+1]+"\"><br><h3>Title: "+booksArray[i+2] +"</h3><br><p>Description: "+booksArray[i]+"</p><div class=\"paypal-class\" id=\"paypal-button\"></div></div></div></div></div>")
                 bookCounter++;
                     }
 
@@ -180,7 +180,7 @@ $(document).ready(function(){
 
     else if(counter == 1){
         var myCarousel = $("#bookCarousel")
-        myCarousel.append("<div class=\"carousel-item\"><div class=\"col-md-4\"><div style=\"height:400px;\" class=\"card card-body\"><img loading=\"eager\" class=\"img-fluid\" src=\""+ booksArray[1]+"\"><br><h3>Title: "+booksArray[2] +"</h3><br><p>Description: "+booksArray[0]+"</p><div class=\"paypal-class\" id=\"paypal-button\"></div></div></div></div>")
+        myCarousel.append("<div class=\"carousel-item\"><div class=\"col-md-4\"><div style=\"border:1px black solid; height:400px;\" class=\"card card-body\"><img loading=\"eager\" class=\"img-fluid\" src=\""+ booksArray[1]+"\"><br><h3>Title: "+booksArray[2] +"</h3><br><p>Description: "+booksArray[0]+"</p><div class=\"paypal-class\" id=\"paypal-button\"></div></div></div></div>")
         $('.carousel .carousel-item').each(function(){
             for (i = 0; i<2; i++){
                 $(this).children(':first-child').clone().appendTo($(this))
@@ -240,7 +240,6 @@ $(document).ready(function(){
     for(i=2;i<booksArray.length;i+=4){
       document.getElementById('correcter').innerHTML = booksArray[i]
       titles.push(document.getElementById('correcter').innerHTML)
-
     }
       document.getElementById('correcter').remove()
     for(i=3;i<booksArray.length;i+=4)

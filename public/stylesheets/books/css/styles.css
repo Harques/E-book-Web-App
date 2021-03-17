@@ -80,7 +80,7 @@ table {
   padding: .25rem 1rem;
 }
 html { 
-background: url("../images/wp1812277.jpg") no-repeat center center fixed; 
+background-color: white;
 -webkit-background-size: cover;
 -moz-background-size: cover;
 -o-background-size: cover;
